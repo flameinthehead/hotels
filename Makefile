@@ -4,6 +4,9 @@ up:
 down:
 	docker-compose down
 
+exec:
+	docker exec -it hotels_php_cli bash
+
 tinker:
 	docker-compose exec php-cli php artisan tinker
 
