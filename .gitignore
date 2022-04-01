@@ -16,3 +16,4 @@ yarn-error.log
 /storage/docker
 .composer
 auth.json
+.bash_history
