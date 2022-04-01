@@ -2,33 +2,31 @@
 
 namespace App\Console\Commands;
 
-use App\UseCase\Proxy\Parser;
-use App\UseCase\Proxy\Source\FreeProxy;
-use GuzzleHttp\Client;
+use App\UseCase\Proxy\Checker;
 use Illuminate\Console\Command;
 
-class UpdateProxy extends Command
+class CheckProxy extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'proxy:update';
+    protected $signature = 'proxy:check {source}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Обновление прокси из источников config/proxy';
+    protected $description = 'Проверка прокси на работоспособность';
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(private Parser $parser)
+    public function __construct(private Checker $checker)
     {
         parent::__construct();
     }
@@ -40,11 +38,9 @@ class UpdateProxy extends Command
      */
     public function handle()
     {
-        $sources = config('proxy.sources');
-        foreach ($sources as $sourceClass) {
-            $this->parser->update(new $sourceClass(new Client()));
-        }
+        $source = $this->argument('source');
 
+        $this->checker->check($source);
         return 0;
     }
 }

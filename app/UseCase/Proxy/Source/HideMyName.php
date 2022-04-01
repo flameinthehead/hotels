@@ -8,8 +8,8 @@ use Illuminate\Support\Collection;
 
 class HideMyName implements SourceInterface
 {
-    public const BASE_URL = 'https://hidemy.name/ru/proxy-list/?maxtime=100';
-    public const PAGES = 20;
+    public const BASE_URL = 'https://hidemy.name/ru/proxy-list/';
+    public const PAGES = 100;
     public const SOURCE = 'hidemyname';
 
     public function __construct(private Client $client)
@@ -20,10 +20,10 @@ class HideMyName implements SourceInterface
     {
         $proxyList = [];
         // первые 20 страниц по пингу
-        for($page = 1; $page <= 2; ++$page) {
+        for($page = 1; $page <= self::PAGES; ++$page) {
             $url = self::BASE_URL;
             if($page > 1){
-                $url .= '&start='.(($page - 1) * 64);
+                $url .= '?start='.(($page - 1) * 64);
             }
             $response = $this->client->request('GET', $url, [
                 'headers' => [

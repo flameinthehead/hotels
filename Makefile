@@ -1,8 +1,8 @@
 up:
-	docker-compose up --build -d
+	docker-compose up -d --build && docker-compose ps
 
 down:
-	docker-compose down
+	docker-compose down -v --remove-orphans
 
 exec:
 	docker exec -it hotels_php_cli bash

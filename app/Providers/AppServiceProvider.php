@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,8 +15,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(Serializer::class, function ($app) {
+            $encoders = [];
+            $normalizers = [new GetSetMethodNormalizer()];
+            return new Serializer($normalizers, $encoders);
+        });
     }
+
 
     /**
      * Bootstrap any application services.
