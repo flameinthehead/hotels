@@ -6,6 +6,7 @@ use App\Models\Proxy;
 use App\UseCase\Proxy\Parser;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 use function config;
 
 class Update extends Command
@@ -53,10 +54,10 @@ class Update extends Command
                     $this->error('Неизвестный код прокси');
                     return self::FAILURE;
                 }
-                $this->parser->update(new $sources[$source](new Client()), $proxy);
+                $this->parser->update(App::make($sources[$source]), $proxy);
             } else {
                 foreach ($sources as $sourceClass) {
-                    $this->parser->update(new $sourceClass(new Client()), $proxy);
+                    $this->parser->update(App::make($sourceClass), $proxy);
                 }
             }
             $this->info('Прокси обновлены');
