@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\UseCase\Proxy\Source\FreeProxyListNet;
 use App\UseCase\Proxy\Source\Geonode;
 use App\UseCase\Proxy\Source\HideMyName;
 use App\UseCase\Proxy\Source\ProxyScrape;
@@ -42,6 +43,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('proxy:update ' . Geonode::SOURCE)->hourly();
         $schedule->command('proxy:update ' . RootJazz::SOURCE)->hourly();
         $schedule->command('proxy:update ' . ProxyScrape::SOURCE)->hourly();
+        $schedule->command('proxy:update ' . FreeProxyListNet::SOURCE)->hourly();
     }
 
     // проверка полученных прокси на пригодность
