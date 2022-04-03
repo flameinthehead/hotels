@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Proxy;
 
 use App\UseCase\Proxy\Checker;
 use Illuminate\Console\Command;
 
-class CheckProxy extends Command
+class Check extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'proxy:check {source}';
+    protected $signature = 'proxy:check {searchSource} {proxySource?}';
 
     /**
      * The console command description.
@@ -38,9 +38,10 @@ class CheckProxy extends Command
      */
     public function handle()
     {
-        $source = $this->argument('source');
+        $searchSource = $this->argument('searchSource');
+        $proxySource = $this->argument('proxySource');
 
-        $this->checker->check($source);
+        $this->checker->check($searchSource, $proxySource);
         return 0;
     }
 }

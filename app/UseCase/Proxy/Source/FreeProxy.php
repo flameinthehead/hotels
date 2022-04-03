@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 class FreeProxy implements SourceInterface
 {
     public const BASE_URL = 'http://free-proxy.cz/ru/proxylist/main/ping/';
+    public const SOURCE = 'freeproxy';
 
     public function __construct(private Client $client)
     {
@@ -24,11 +25,14 @@ class FreeProxy implements SourceInterface
                 'connect_timeout' => 10,
             ]);
             $html = $response->getBody()->getContents();
-            preg_match('/<table id="proxy_list">(.*)</table>/', $html, $matches);
-            dd($matches);
             dd($html);
+            preg_match('/<table id="proxy_list">(.*)</table>/', $html, $matches);
         }
         return collect($proxyList);
     }
 
+    public function getSource(): string
+    {
+        return self::SOURCE;
+    }
 }

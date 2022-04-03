@@ -7,9 +7,9 @@ use App\Models\Proxy;
 
 class Parser
 {
-    public function update(SourceInterface $source)
+    public function update(SourceInterface $source, Proxy $proxy = null)
     {
-        $proxyList = $source->parse();
+        $proxyList = $source->parse($proxy);
 
         foreach ($proxyList as $item) {
             $proxy = Proxy::firstOrCreate($item);

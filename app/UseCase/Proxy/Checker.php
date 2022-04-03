@@ -4,7 +4,6 @@ namespace App\UseCase\Proxy;
 
 use App\Models\City;
 use App\Models\Proxy;
-use App\Models\ProxyAdditional;
 use App\UseCase\Search\Params;
 use App\UseCase\Search\SearchFactory;
 use Illuminate\Support\Carbon;
@@ -15,14 +14,14 @@ class Checker
     {
     }
 
-    public function check(string $source)
+    public function check(string $searchSourceCode, string $proxySource = null)
     {
-        $proxyForChecker = $this->proxy->forChecker($source);
+        $proxyForChecker = $this->proxy->forChecker($searchSourceCode, $proxySource);
         if (empty($proxyForChecker) || !is_array($proxyForChecker)) {
             return;
         }
 
-        $searchSource = SearchFactory::makeSearchBySourceName($source);
+        $searchSource = SearchFactory::makeSearchBySourceName($searchSourceCode);
         $params = new Params();
         $params->setAdults(2);
 
@@ -36,18 +35,13 @@ class Checker
 
         /* @var Proxy $proxyEntity */
         foreach ($proxyForChecker as $proxyEntity) {
-            $proxyAdditional = $proxyEntity->proxyAdditional()->get()->first();
-            if(!$proxyAdditional){
-                $proxyAdditional = new ProxyAdditional();
-                $proxyAdditional->proxy()->associate($proxyEntity);
-            }
             try {
                 $searchSource->search($proxyEntity);
-                $proxyAdditional->{$source} = '1';
+                $proxyEntity->{$searchSourceCode} = '1';
             } catch (\Exception $e) {
-                $proxyAdditional->{$source} = '0';
+                $proxyEntity->{$searchSourceCode} = '0';
             }
-            $proxyAdditional->save();
+            $proxyEntity->save();
         }
     }
 }

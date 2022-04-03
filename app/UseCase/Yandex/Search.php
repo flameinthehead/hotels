@@ -46,7 +46,6 @@ class Search implements SearchSourceInterface
         ];
         if(!empty($proxy) && !empty($proxy->address)){
             $options['proxy'] = $proxy->address;
-//            $options['proxy'] = '185.170.166.107:80';
         }
 
         $response = $this->client->request('GET', self::SEARCH_BASE_URL, $options);

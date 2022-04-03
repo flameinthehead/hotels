@@ -14,7 +14,7 @@ class Proxy extends Model
         'enabled',
     ];
 
-    public function forChecker(string $source = '')
+    public function forChecker(string $source = '', string $proxySource = null)
     {
         $query = self::query();
         if (!empty($source) && Schema::hasColumn($this->getTable(), $source)) {
@@ -25,11 +25,10 @@ class Proxy extends Model
             });
         }
 
-        return $query->get()->all();
-    }
+        if(!empty($proxySource)) {
+            $query->where('source', $proxySource);
+        }
 
-    public function proxyAdditional()
-    {
-        return $this->hasOne(ProxyAdditional::class);
+        return $query->get()->all();
     }
 }
