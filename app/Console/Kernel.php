@@ -6,6 +6,7 @@ use App\UseCase\Proxy\Source\FreeProxyListNet;
 use App\UseCase\Proxy\Source\Geonode;
 use App\UseCase\Proxy\Source\HideMyName;
 use App\UseCase\Proxy\Source\ProxyScrape;
+use App\UseCase\Proxy\Source\ProxySearcher;
 use App\UseCase\Proxy\Source\RootJazz;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -39,11 +40,10 @@ class Kernel extends ConsoleKernel
     // обновление прокси с сайтов
     private function updateProxy(Schedule $schedule): void
     {
-        $schedule->command('proxy:update ' . HideMyName::SOURCE)->daily();
-        $schedule->command('proxy:update ' . Geonode::SOURCE)->hourly();
-        $schedule->command('proxy:update ' . RootJazz::SOURCE)->hourly();
-        $schedule->command('proxy:update ' . ProxyScrape::SOURCE)->hourly();
-        $schedule->command('proxy:update ' . FreeProxyListNet::SOURCE)->hourly();
+        $sources = config('proxy.sources');
+        foreach($sources as $source => $class) {
+            $schedule->command('proxy:update ' . $class::SOURCE)->daily();
+        }
     }
 
     // проверка полученных прокси на пригодность
