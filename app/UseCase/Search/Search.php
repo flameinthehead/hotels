@@ -7,7 +7,7 @@ use App\Models\City;
 use App\Models\Proxy;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Collection;
 
 class Search
 {
@@ -15,7 +15,7 @@ class Search
     {
     }
 
-    public function search(SearchRequest $request)
+    public function search(SearchRequest $request): Collection
     {
         $searchSources = config('search_sources');
         if (empty($searchSources)) {
@@ -49,7 +49,7 @@ class Search
             }
         }
 
-        dd($searchResults);
+        return $searchResults;
     }
 
     private function prepareParams(SearchRequest $request): Params

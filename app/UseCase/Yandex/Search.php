@@ -45,7 +45,7 @@ class Search implements SearchSourceInterface
             ],
             'connect_timeout' => 5,
             'on_stats' => function(TransferStats $stats) use ($proxy) {
-                echo 'transfer time = ' . $stats->getTransferTime()."\r\n";
+
             }
         ];
         if(!empty($proxy) && !empty($proxy->address)){

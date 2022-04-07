@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\UseCase\Search\Result;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class HotelResource extends JsonResource
@@ -14,9 +15,14 @@ class HotelResource extends JsonResource
      */
     public function toArray($request)
     {
+        /* @var Result $this */
         return [
-            'id' => 123,
-            'name' => 'test'
+            'name' => $this->getName(),
+            'price' => $this->getPrice(),
+            'bookLink' => $this->getBookLink(),
+            'facilities' => $this->getFacilities(),
+            'distanceToCenter' => $this->getDistanceToCenter(),
+            'hotelPreview' => $this->getHotelPreview(),
         ];
     }
 }

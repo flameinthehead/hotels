@@ -17,7 +17,7 @@ class Result
     private array $facilities;
 
     // Расстояние до центра
-    private float $distanceToCenter;
+    private float|null $distanceToCenter = null;
 
     // Превью отеля
     private string $hotelPreview;
@@ -68,7 +68,7 @@ class Result
         $this->facilities = $facilities;
     }
 
-    public function getDistanceToCenter(): float
+    public function getDistanceToCenter(): mixed
     {
         return $this->distanceToCenter;
     }

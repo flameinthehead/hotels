@@ -48,7 +48,6 @@ class ResultFactory implements SearchResultFactory
                 $searchResult['hotel']['geoFeature']['name'],
             )
         ) {
-
             $result->setDistanceToCenter((float)str_replace(',', '.', $distance));
         }
     }
