@@ -3,7 +3,6 @@
 namespace App\UseCase\Yandex;
 
 use App\UseCase\Search\SearchParamsFactoryInterface;
-use Carbon\Carbon;
 
 class Params implements SearchParamsFactoryInterface
 {

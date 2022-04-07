@@ -7,6 +7,7 @@ use App\Models\Proxy;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
+use Illuminate\Support\Collection;
 use Symfony\Component\Serializer\Serializer;
 
 class Search implements SearchSourceInterface
@@ -19,8 +20,11 @@ class Search implements SearchSourceInterface
     {
     }
 
-    public function search(Proxy $proxy = null)
+    public function search(Proxy $proxy): Collection
     {
+        if (empty($this->params)) {
+            throw new \Exception('Не заданы параметры поиска');
+        }
         $options = [
             'query' => $this->serializer->normalize($this->params, 'array'),
             'headers' => [
@@ -58,10 +62,16 @@ class Search implements SearchSourceInterface
             throw new YandexSearchException('Yandex search invalid response');
         }
 
-        if (!isset($response['data']['hotels'])) {
+        if (!isset($response['data']['hotels']) || !is_array($response['data']['hotels'])) {
             throw new YandexSearchException('Yandex search no hotels found');
         }
-        return $response['data']['hotels'];
+
+        $searchResults = collect([]);
+        foreach ($response['data']['hotels'] as $row) {
+            $searchResults->push(ResultFactory::makeResult($row, $this->params));
+        }
+
+        return $searchResults;
     }
 
     public function setParams(\App\UseCase\Search\Params $generalParams)

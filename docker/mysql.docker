@@ -1,5 +1,4 @@
 FROM mysql:8.0
-
 USER 1000
 
 WORKDIR /var/www

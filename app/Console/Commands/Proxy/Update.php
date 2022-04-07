@@ -4,7 +4,6 @@ namespace App\Console\Commands\Proxy;
 
 use App\Models\Proxy;
 use App\UseCase\Proxy\Parser;
-use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
 use function config;
@@ -56,9 +55,12 @@ class Update extends Command
                 }
                 $this->parser->update(App::make($sources[$source]), $proxy);
             } else {
+                $bar = $this->output->createProgressBar(count($sources));
                 foreach ($sources as $sourceClass) {
                     $this->parser->update(App::make($sourceClass), $proxy);
+                    $bar->advance();
                 }
+                $bar->finish();
             }
             $this->info('Прокси обновлены');
         } catch (\Exception $e) {

@@ -31,4 +31,9 @@ class Proxy extends Model
 
         return $query->get()->all();
     }
+
+    public function getRandBySource(string $source): self
+    {
+        return self::query()->where($source, '1')->inRandomOrder()->first();
+    }
 }
