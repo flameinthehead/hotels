@@ -8,12 +8,30 @@ class Params implements SearchParamsFactoryInterface
 {
     public const SORT_CHEAP_FIRST = 'cheap-first';
 
-    private string $startSearchReason = 'sort';
+    private string $startSearchReason = 'mount';
 
     // количество отелей на странице
     private int $pageHotelCount = 25;
 
     private int $pricedHotelLimit = 26;
+
+    private int $totalHotelLimit = 50;
+
+    private int $pollIteration = 0;
+
+    private int $pollEpoch = 0;
+
+    private int $geoId;
+
+    private int $adults;
+
+    private string $checkinDate;
+
+    private string $checkoutDate;
+
+    private string $selectedSortId = self::SORT_CHEAP_FIRST;
+
+    private string $geoLocationStatus = 'unknown';
 
     /**
      * @return string
@@ -112,35 +130,19 @@ class Params implements SearchParamsFactoryInterface
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getCheckInDate(): string
+    public function getGeoId(): int
     {
-        return $this->checkInDate;
+        return $this->geoId;
     }
 
     /**
-     * @param string $checkInDate
+     * @param int $geoId
      */
-    public function setCheckInDate(string $checkInDate): void
+    public function setGeoId(int $geoId): void
     {
-        $this->checkInDate = $checkInDate;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCheckOutDate(): string
-    {
-        return $this->checkOutDate;
-    }
-
-    /**
-     * @param string $checkOutDate
-     */
-    public function setCheckOutDate(string $checkOutDate): void
-    {
-        $this->checkOutDate = $checkOutDate;
+        $this->geoId = $geoId;
     }
 
     /**
@@ -159,33 +161,42 @@ class Params implements SearchParamsFactoryInterface
         $this->adults = $adults;
     }
 
+
     /**
-     * @return int
+     * @return string
      */
-    public function getGeoId(): int
+    public function getCheckinDate(): string
     {
-        return $this->geoId;
+        return $this->checkinDate;
     }
 
     /**
-     * @param int $geoId
+     * @param string $checkInDate
      */
-    public function setGeoId(int $geoId): void
+    public function setCheckinDate(string $checkinDate): void
     {
-        $this->geoId = $geoId;
+        $this->checkinDate = $checkinDate;
     }
 
     /**
      * @return string
      */
+    public function getCheckoutDate(): string
+    {
+        return $this->checkoutDate;
+    }
+
+    public function setCheckOutDate(string $checkoutDate): void
+    {
+        $this->checkoutDate = $checkoutDate;
+    }
+
+
     public function getSelectedSortId(): string
     {
         return $this->selectedSortId;
     }
 
-    /**
-     * @param string $selectedSortId
-     */
     public function setSelectedSortId(string $selectedSortId): void
     {
         $this->selectedSortId = $selectedSortId;
@@ -207,24 +218,6 @@ class Params implements SearchParamsFactoryInterface
         $this->geoLocationStatus = $geoLocationStatus;
     }
 
-    private int $totalHotelLimit = 50;
-
-    private int $pollIteration = 0;
-
-    private int $pollEpoch = 1;
-
-    private string $checkInDate;
-
-    private string $checkOutDate;
-
-    private int $adults;
-
-    private int $geoId;
-
-    private string $selectedSortId = self::SORT_CHEAP_FIRST;
-
-    private string $geoLocationStatus = 'unknown';
-
     public static function makeSourceParams(\App\UseCase\Search\Params $generalParams): self
     {
         $params = new self();
@@ -232,6 +225,7 @@ class Params implements SearchParamsFactoryInterface
         $params->setCheckOutDate($generalParams->getCheckOutDate()->format('Y-m-d'));
         $params->setAdults($generalParams->getAdults());
         $params->setGeoId(39); // @TODO сделать парсинг городов яндекса, пока оставим Ростов
+
         return $params;
     }
 }

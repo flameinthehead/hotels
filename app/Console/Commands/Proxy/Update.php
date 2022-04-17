@@ -48,7 +48,7 @@ class Update extends Command
             /* @var Proxy $proxy */
             $proxy = null;
 
-            if($source) {
+            if (!empty($source)) {
                 if(!isset($sources[$source])){
                     $this->error('Неизвестный код прокси');
                     return self::FAILURE;

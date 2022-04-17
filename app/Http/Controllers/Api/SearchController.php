@@ -20,6 +20,8 @@ class SearchController extends Controller
         try {
             $results = $this->search->search($request);
         } catch (\Exception $e) {
+            $this->search->disableLastProxy();
+
             return response()->json([
                 'success' => false,
                 'errors' => ['searchError' => [$e->getMessage()]],

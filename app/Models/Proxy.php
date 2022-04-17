@@ -14,7 +14,7 @@ class Proxy extends Model
         'enabled',
     ];
 
-    public function forChecker(string $source = '', string $proxySource = null)
+    public function forChecker(string $source = '', string $proxySource = null): array
     {
         $query = self::query();
         if (!empty($source) && Schema::hasColumn($this->getTable(), $source)) {
@@ -29,11 +29,14 @@ class Proxy extends Model
             $query->where('source', $proxySource);
         }
 
+        $query->orderBy('updated_at', 'DESC');
+
         return $query->get()->all();
     }
 
     public function getRandBySource(string $source): self
     {
-        return self::query()->where($source, '1')->inRandomOrder()->first();
+        $query = self::query()->where($source, '1')->inRandomOrder();
+        return $query->firstOrFail();
     }
 }

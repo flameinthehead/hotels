@@ -11,7 +11,9 @@ use Illuminate\Support\Collection;
 
 class Search
 {
-    public function __construct(private Proxy $proxy)
+    private string $source;
+
+    public function __construct(private Proxy $proxy, private Proxy $lastProxy)
     {
     }
 
@@ -27,6 +29,7 @@ class Search
         $searchResults = collect([]);
 
         foreach ($searchSources as $source) {
+            $this->source = $source;
             /* @var SearchSourceInterface $sourceEngine */
             $sourceEngine = \App::get($source);
             if (empty($sourceEngine) || (!$sourceEngine instanceof SearchSourceInterface)) {
@@ -36,9 +39,10 @@ class Search
             if (!Schema::hasColumn('proxies', $source)) {
                 throw new \Exception('Не заданы прокси для источника ' . $source);
             }
-            /* @var Proxy $sourceProxy */
-            $sourceProxy = $this->proxy->getRandBySource($source);
-            if(!$sourceProxy){
+            /* @var Proxy */
+            $this->lastProxy = $this->proxy->getRandBySource($source);
+
+            if (! $this->lastProxy) {
                 throw new \Exception('Не найден прокси для источника ' . $source);
             }
 
@@ -50,6 +54,22 @@ class Search
         }
 
         return $searchResults;
+    }
+
+    public function getLastProxy(): Proxy
+    {
+        return $this->lastProxy;
+    }
+
+    public function getLastSource(): string
+    {
+        return $this->source;
+    }
+
+    public function disableLastProxy()
+    {
+        $this->getLastProxy()->{$this->getLastSource()} = '0';
+        $this->getLastProxy()->save();
     }
 
     private function prepareParams(SearchRequest $request): Params
