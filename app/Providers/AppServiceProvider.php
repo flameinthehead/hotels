@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use http\Client;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -15,6 +16,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->bind('GuzzleHttp\Client', function () {
+            return new \GuzzleHttp\Client(['verify' => false]);
+        });
+
         $this->app->bind(Serializer::class, function ($app) {
             $encoders = [];
             $normalizers = [new GetSetMethodNormalizer()];
