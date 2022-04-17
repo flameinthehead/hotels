@@ -14,7 +14,7 @@ class Checker
     {
     }
 
-    public function check(string $searchSourceCode, string $proxySource = null)
+    public function check(string $searchSourceCode, string $proxySource = null, \Illuminate\Console\OutputStyle $output)
     {
         $proxyForChecker = $this->proxy->forChecker($searchSourceCode, $proxySource);
         if (empty($proxyForChecker) || !is_array($proxyForChecker)) {
@@ -33,8 +33,10 @@ class Checker
 
         $searchSource->setParams($params);
 
+        $bar = $output->createProgressBar(count($proxyForChecker));
         /* @var Proxy $proxyEntity */
         foreach ($proxyForChecker as $proxyEntity) {
+            $bar->advance();
             try {
                 $searchSource->search($proxyEntity);
                 $proxyEntity->{$searchSourceCode} = '1';
@@ -43,5 +45,6 @@ class Checker
             }
             $proxyEntity->save();
         }
+        $bar->finish();
     }
 }

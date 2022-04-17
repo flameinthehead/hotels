@@ -41,7 +41,7 @@ class Check extends Command
         $searchSource = $this->argument('searchSource');
         $proxySource = $this->argument('proxySource');
 
-        $this->checker->check($searchSource, $proxySource);
+        $this->checker->check($searchSource, $proxySource, $this->output);
         return 0;
     }
 }
