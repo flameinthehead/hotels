@@ -20,7 +20,7 @@ class Result
     private float|null $distanceToCenter = null;
 
     // Превью отеля
-    private string $hotelPreview;
+    private string|null $hotelPreview = null;
 
     /**
      * @return string
@@ -83,7 +83,7 @@ class Result
         return $this->hotelPreview;
     }
 
-    public function setHotelPreview(string $hotelPreview): void
+    public function setHotelPreview(string|null $hotelPreview): void
     {
         $this->hotelPreview = $hotelPreview;
     }

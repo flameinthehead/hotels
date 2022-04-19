@@ -11,6 +11,7 @@
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "ramsey/uuid": "^4.3",
         "symfony/property-access": "^6.0",
         "symfony/serializer": "^6.0"
     },

@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 
 class Search
 {
-    private string $source;
+    private ?string $source = null;
 
     public function __construct(private Proxy $proxy, private Proxy $lastProxy)
     {
@@ -61,15 +61,19 @@ class Search
         return $this->lastProxy;
     }
 
-    public function getLastSource(): string
+    public function getLastSource(): ?string
     {
         return $this->source;
     }
 
-    public function disableLastProxy()
+    public function disableLastProxy(): void
     {
-        $this->getLastProxy()->{$this->getLastSource()} = '0';
-        $this->getLastProxy()->save();
+        $proxy = $this->getLastProxy();
+        $source = $this->getLastSource();
+        if (!empty($proxy) && !empty($source)) {
+            $proxy->{$source} = '0';
+            $proxy->save();
+        }
     }
 
     private function prepareParams(SearchRequest $request): Params

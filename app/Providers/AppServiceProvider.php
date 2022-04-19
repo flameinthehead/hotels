@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use http\Client;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;

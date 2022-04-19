@@ -17,6 +17,10 @@ class SearchSourceServiceProvider extends ServiceProvider
         $this->app->bind('yandex', function ($app) {
             return $app->make(Search::class);
         });
+
+        $this->app->bind('ostrovok', function ($app) {
+            return $app->make(\App\UseCase\Ostrovok\Search::class);
+        });
     }
 
     /**

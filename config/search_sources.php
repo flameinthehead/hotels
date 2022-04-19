@@ -3,4 +3,5 @@
 // Источники поиска
 return [
     'yandex',
+    'ostrovok',
 ];

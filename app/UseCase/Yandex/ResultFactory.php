@@ -10,7 +10,7 @@ class ResultFactory implements SearchResultFactory
 {
     const BASE_RESULT_URL = 'https://travel.yandex.ru/hotels/';
 
-    public static function makeResult(array $searchResult, SearchParamsFactoryInterface $params): Result
+    public static function makeResult(array $searchResult, SearchParamsFactoryInterface $params): ?Result
     {
         /* @var Params $params */
         $result = new Result();
