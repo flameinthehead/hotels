@@ -35,6 +35,8 @@ class ResultFactory implements SearchResultFactory
 
         $result->setPrice(reset($searchResult['offers'])['price']['value']);
         $result->setRef('yandex');
+        $result->setLongitude($searchResult['hotel']['coordinates']['lon']);
+        $result->setLatitude($searchResult['hotel']['coordinates']['lat']);
 
         return $result;
     }

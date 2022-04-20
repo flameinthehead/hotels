@@ -22,7 +22,34 @@ class Result
     // Превью отеля
     private string|null $hotelPreview = null;
 
+    // Источник поиска
     private string $ref;
+
+    // Широта отеля
+    private float $latitude;
+
+    // Долгота отеля
+    private float $longitude;
+
+    public function getLatitude(): float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(float $latitude): void
+    {
+        $this->latitude = $latitude;
+    }
+
+    public function getLongitude(): float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(float $longitude): void
+    {
+        $this->longitude = $longitude;
+    }
 
     /**
      * @return string

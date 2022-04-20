@@ -13,11 +13,11 @@ class Search
 {
     private ?string $source = null;
 
-    public function __construct(private Proxy $proxy, private Proxy $lastProxy)
+    public function __construct(private Proxy $proxy, private Proxy $lastProxy, private Sorter $sorter)
     {
     }
 
-    public function search(SearchRequest $request): Collection
+    public function search(SearchRequest $request): array
     {
         $searchSources = config('search_sources');
         if (empty($searchSources)) {
@@ -51,11 +51,9 @@ class Search
             if (!empty($results)) {
                 $searchResults = $searchResults->merge($results);
             }
-            dump($source);
-            dump($searchResults);
         }
-        dd('END');
-        return $searchResults;
+
+        return $this->sorter->sort($searchResults);
     }
 
     public function getLastProxy(): Proxy

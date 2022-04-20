@@ -14,7 +14,6 @@ class ResultFactory implements SearchResultFactory
 
     public static function makeResult(array $searchResult, SearchParamsFactoryInterface $params): ?Result
     {
-
         $hotelName = $searchResult['static_vm']['name'] ?? null;
         $price = $searchResult['rates'][0]['payment_options']['payment_types'][0]['amount'] ?? null;
 
@@ -50,7 +49,6 @@ class ResultFactory implements SearchResultFactory
             );
         }
 
-
         $result = new Result();
         $result->setName($hotelName);
         $result->setPrice($price);
@@ -59,6 +57,8 @@ class ResultFactory implements SearchResultFactory
         $result->setDistanceToCenter($distanceToCenter);
         $result->setHotelPreview($preview);
         $result->setRef('ostrovok');
+        $result->setLatitude($searchResult['static_vm']['latitude']);
+        $result->setLongitude($searchResult['static_vm']['longitude']);
 
         return $result;
     }
