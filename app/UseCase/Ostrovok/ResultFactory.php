@@ -58,6 +58,7 @@ class ResultFactory implements SearchResultFactory
         $result->setFacilities($facilities);
         $result->setDistanceToCenter($distanceToCenter);
         $result->setHotelPreview($preview);
+        $result->setRef('ostrovok');
 
         return $result;
     }

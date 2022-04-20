@@ -34,6 +34,7 @@ class ResultFactory implements SearchResultFactory
         }
 
         $result->setPrice(reset($searchResult['offers'])['price']['value']);
+        $result->setRef('yandex');
 
         return $result;
     }

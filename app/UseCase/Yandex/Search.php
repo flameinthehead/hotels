@@ -13,6 +13,8 @@ class Search implements SearchSourceInterface
 {
     public const SEARCH_BASE_URL = 'https://travel.yandex.ru/api/hotels/searchHotels';
 
+    public const CONNECTION_TIMEOUT = 5;
+
     private Params $params;
 
     public function __construct(private Client $client, private Serializer $serializer)
@@ -75,7 +77,7 @@ class Search implements SearchSourceInterface
                 "Upgrade-Insecure-Requests" => "1",
                 "User-Agent" => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
             ],
-            'connect_timeout' => 5,
+            'connect_timeout' => self::CONNECTION_TIMEOUT,
         ];
         if(!empty($proxy) && !empty($proxy->address)){
             $options['proxy'] = $proxy->address;

@@ -51,8 +51,10 @@ class Search
             if (!empty($results)) {
                 $searchResults = $searchResults->merge($results);
             }
+            dump($source);
+            dump($searchResults);
         }
-
+        dd('END');
         return $searchResults;
     }
 

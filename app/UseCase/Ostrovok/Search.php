@@ -13,6 +13,8 @@ class Search implements SearchSourceInterface
 {
     public const SEARCH_BASE_URL = 'https://ostrovok.ru/hotel/search/v2/site/serp';
 
+    public const CONNECTION_TIMEOUT = 5;
+
     private \App\UseCase\Ostrovok\Params $params;
 
     public function __construct(private Client $client)
@@ -30,6 +32,7 @@ class Search implements SearchSourceInterface
             [
                 'json' => json_decode(json_encode($this->prepareOptions())),
                 'proxy' => $proxy->address,
+                'connect_timeout' => self::CONNECTION_TIMEOUT,
             ]
         );
 

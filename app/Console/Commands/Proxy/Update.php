@@ -57,8 +57,8 @@ class Update extends Command
             } else {
                 $bar = $this->output->createProgressBar(count($sources));
                 foreach ($sources as $sourceClass) {
-                    $this->parser->update(App::make($sourceClass), $proxy);
                     $bar->advance();
+                    $this->parser->update(App::make($sourceClass), $proxy);
                 }
                 $bar->finish();
             }

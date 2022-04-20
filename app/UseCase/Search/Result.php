@@ -22,6 +22,8 @@ class Result
     // Превью отеля
     private string|null $hotelPreview = null;
 
+    private string $ref;
+
     /**
      * @return string
      */
@@ -86,5 +88,15 @@ class Result
     public function setHotelPreview(string|null $hotelPreview): void
     {
         $this->hotelPreview = $hotelPreview;
+    }
+
+    public function getRef(): string
+    {
+        return $this->ref;
+    }
+
+    public function setRef(string $ref): void
+    {
+        $this->ref = $ref;
     }
 }
