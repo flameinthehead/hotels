@@ -3,7 +3,9 @@
 namespace App\UseCase\Ostrovok;
 
 use App\Exceptions\OstrovokSearchException;
+use App\Models\OstrovokCity;
 use App\Models\Proxy;
+use App\Models\YandexCity;
 use App\UseCase\Search\Params;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
@@ -17,7 +19,7 @@ class Search implements SearchSourceInterface
 
     private \App\UseCase\Ostrovok\Params $params;
 
-    public function __construct(private Client $client)
+    public function __construct(private Client $client, private Suggestions $suggestions)
     {
     }
 
@@ -58,6 +60,13 @@ class Search implements SearchSourceInterface
 
     public function setParams(Params $generalParams)
     {
+        if (empty($generalParams->getCity()->ostrovokCity()->first())) {
+            $cityId = $this->suggestions->findByCityName($generalParams->getCity()->name);
+            $ostrovokCity = new OstrovokCity();
+            $ostrovokCity->ostrovok_city_id = $cityId;
+            $ostrovokCity->city_id = $generalParams->getCity()->id;
+            $ostrovokCity->save();
+        }
         $this->params = \App\UseCase\Ostrovok\Params::makeSourceParams($generalParams);
     }
 

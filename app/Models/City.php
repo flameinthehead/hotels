@@ -14,4 +14,9 @@ class City extends Model
     {
         return $this->hasOne(YandexCity::class);
     }
+
+    public function ostrovokCity(): HasOne
+    {
+        return $this->hasOne(OstrovokCity::class);
+    }
 }

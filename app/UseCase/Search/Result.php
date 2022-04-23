@@ -14,7 +14,7 @@ class Result
     private string $bookLink;
 
     // Удобства
-    private array $facilities;
+    private array|null $facilities = null;
 
     // Расстояние до центра
     private float|null $distanceToCenter = null;
@@ -87,7 +87,7 @@ class Result
         $this->bookLink = $bookLink;
     }
 
-    public function getFacilities(): array
+    public function getFacilities(): array|null
     {
         return $this->facilities;
     }
