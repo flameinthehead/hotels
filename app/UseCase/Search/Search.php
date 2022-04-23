@@ -7,7 +7,6 @@ use App\Models\City;
 use App\Models\Proxy;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Collection;
 
 class Search
 {
@@ -80,7 +79,7 @@ class Search
     {
         $cityCode = $request->get('city');
         /* @var City $city */
-        $city = City::query()->where('code', $cityCode)->first();
+        $city = City::query()->where('name', $cityCode)->first();
         if (!$city) {
             throw new \Exception('Неизвестный город с кодом ' . $cityCode);
         }

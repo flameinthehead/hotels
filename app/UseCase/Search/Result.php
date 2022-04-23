@@ -107,7 +107,7 @@ class Result
         $this->distanceToCenter = $distanceToCenter;
     }
 
-    public function getHotelPreview(): string
+    public function getHotelPreview(): string|null
     {
         return $this->hotelPreview;
     }

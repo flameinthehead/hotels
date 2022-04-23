@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ProxiesAdditional extends Migration
+class AddYandexCities extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class ProxiesAdditional extends Migration
      */
     public function up()
     {
-        Schema::create('proxies_additional', function (Blueprint $table) {
+        Schema::create('yandex_cities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('proxy_id')->constrained()->onDelete('CASCADE');
-            $table->char('yandex')->nullable();
+            $table->foreignId('city_id')->constrained()->onDelete('CASCADE');
+            $table->integer('yandex_city_id');
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ class ProxiesAdditional extends Migration
      */
     public function down()
     {
-        Schema::drop('proxies_additional');
+        Schema::drop('yandex_cities');
     }
 }

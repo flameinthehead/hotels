@@ -4,6 +4,7 @@ namespace App\UseCase\Yandex;
 
 use App\Exceptions\YandexSearchException;
 use App\Models\Proxy;
+use App\Models\YandexCity;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
@@ -17,7 +18,7 @@ class Search implements SearchSourceInterface
 
     private Params $params;
 
-    public function __construct(private Client $client, private Serializer $serializer)
+    public function __construct(private Client $client, private Serializer $serializer, private Suggestions $suggestions)
     {
     }
 
@@ -54,6 +55,14 @@ class Search implements SearchSourceInterface
 
     public function setParams(\App\UseCase\Search\Params $generalParams)
     {
+        if (empty($generalParams->getCity()->yandexCity()->first())) {
+            $geoId = $this->suggestions->findByCityName($generalParams->getCity()->name);
+            $yandexCity = new YandexCity();
+            $yandexCity->yandex_city_id = $geoId;
+            $yandexCity->city_id = $generalParams->getCity()->id;
+            $yandexCity->save();
+        }
+
         $this->params = Params::makeSourceParams($generalParams);
     }
 

@@ -46,6 +46,10 @@ class Sorter
             $output[] = reset($groupOfSimilar);
         }
 
+        usort($output, function ($a, $b) {
+            return $a->getPrice() < $b->getPrice() ? -1 : 1;
+        });
+
         return $output;
     }
 }

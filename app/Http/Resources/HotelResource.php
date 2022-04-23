@@ -23,6 +23,7 @@ class HotelResource extends JsonResource
             'facilities' => $this->getFacilities(),
             'distanceToCenter' => $this->getDistanceToCenter(),
             'hotelPreview' => $this->getHotelPreview(),
+            'ref' => $this->getRef()
         ];
     }
 }

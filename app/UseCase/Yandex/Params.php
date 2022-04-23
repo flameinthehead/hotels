@@ -224,7 +224,7 @@ class Params implements SearchParamsFactoryInterface
         $params->setCheckInDate($generalParams->getCheckInDate()->format('Y-m-d'));
         $params->setCheckOutDate($generalParams->getCheckOutDate()->format('Y-m-d'));
         $params->setAdults($generalParams->getAdults());
-        $params->setGeoId(39); // @TODO сделать парсинг городов яндекса, пока оставим Ростов
+        $params->setGeoId($generalParams->getCity()->yandexCity()->first()->yandex_city_id);
 
         return $params;
     }
