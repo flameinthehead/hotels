@@ -14,11 +14,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::any(
+    '/webhook/TGGkrT7YO34oh4D9beSMzYSO6c',
+    [\App\Http\Controllers\Api\TelegramController::class, 'messageHandler']
+);
+
+
 Route::get('/search', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('search');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
 
 
