@@ -28,7 +28,7 @@ class SearchRequest extends FormRequest
         return [
             'city' => 'required|string',
             'adults' => 'required|integer',
-            'checkIn' => 'required|date',
+            'checkIn' => 'required|date|after:tomorrow',
             'checkOut' => 'required|date|after:checkIn'
         ];
     }

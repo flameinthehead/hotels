@@ -17,10 +17,11 @@ class TelegramRequests extends Migration
             $table->id();
             $table->timestamps();
             $table->foreignId('city_id')->constrained()->cascadeOnDelete();
-            $table->date('check_in');
-            $table->date('check_out');
-            $table->integer('adults');
+            $table->date('check_in')->nullable();
+            $table->date('check_out')->nullable();
+            $table->integer('adults')->nullable();
             $table->char('is_finished')->default('0');
+            $table->unsignedBigInteger('telegram_from_id')->nullable();
         });
     }
 
