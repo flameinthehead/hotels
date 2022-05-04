@@ -26,7 +26,7 @@ class Checker
         $params->setAdults(2);
 
         /* @var City $city */
-        $city = City::query()->where('code', 'ROV')->first();
+        $city = City::query()->where('name', 'Ростов-на-Дону')->first();
         $params->setCity($city);
         $params->setCheckInDate(Carbon::now()->addWeek());
         $params->setCheckOutDate(Carbon::now()->addWeeks(2));

@@ -16,12 +16,13 @@ class TelegramRequests extends Migration
         Schema::create('telegram_requests', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('city_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('city_id')->nullable()->constrained()->cascadeOnDelete();
             $table->date('check_in')->nullable();
             $table->date('check_out')->nullable();
             $table->integer('adults')->nullable();
             $table->char('is_finished')->default('0');
             $table->unsignedBigInteger('telegram_from_id')->nullable();
+            $table->string('status')->default('new');
         });
     }
 

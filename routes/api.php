@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::any(
+Route::post(
     '/webhook/TGGkrT7YO34oh4D9beSMzYSO6c',
     [\App\Http\Controllers\Api\TelegramController::class, 'messageHandler']
 );
