@@ -2,10 +2,11 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Models\City;
+use App\Models\TelegramRequest;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
+use Symfony\Component\Workflow\TransitionBlocker;
+use ZeroDaHero\LaravelWorkflow\Events\GuardEvent;
 
 class TelegramRequestWorkflowSubscriber
 {
@@ -16,7 +17,6 @@ class TelegramRequestWorkflowSubscriber
      */
     public function __construct()
     {
-        //
     }
 
     /**
@@ -28,13 +28,23 @@ class TelegramRequestWorkflowSubscriber
     public function subscribe($events)
     {
         $events->listen(
-            'workflow.telegram_request.guard',
-            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onGuard'],
+            'workflow.telegram_request.guard.choose_city',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onGuardChooseCity'],
         );
     }
 
-    public function onGuard()
+    public function onGuardChooseCity(GuardEvent $event): void
     {
-        Log::debug('Hi from onGuard!');
+        /** @var TelegramRequest $telegramRequest */
+        $telegramRequest = $event->getSubject();
+        $city = (new City())->findByName($telegramRequest->getLastMessage());
+
+        if (empty($city)) {
+            $event->addTransitionBlocker(
+                new TransitionBlocker('Город не найден. Попробуйте ввести другой город.', '403')
+            );
+        }
+
+        $telegramRequest->city()->associate($city);
     }
 }

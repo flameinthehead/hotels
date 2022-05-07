@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use ZeroDaHero\LaravelWorkflow\Traits\WorkflowTrait;
@@ -44,6 +45,18 @@ class TelegramRequest extends Model
     private int $adults;
 
     /**
+     * Оконченный запрос (когда выведены результаты поиска)
+     * @var bool
+     */
+    private bool $isFinished;
+
+    /**
+     * Последнее сообщение, отправленное боту от пользователя
+     * @var string
+     */
+    private string $lastMessage;
+
+    /**
      * Id пользователя в ТГ
      * @var int
      */
@@ -51,7 +64,7 @@ class TelegramRequest extends Model
 
     protected $guarded = ['id'];
 
-    private function city(): BelongsTo
+    public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
     }
@@ -64,5 +77,27 @@ class TelegramRequest extends Model
     public function scopeNotFinished($builder)
     {
         return $builder->where('is_finished', '0');
+    }
+
+    public function setLastMessage(string $lastMessage): void
+    {
+        $this->lastMessage = $lastMessage;
+    }
+
+    public function getLastMessage(): string
+    {
+        return $this->lastMessage;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    protected function isFinished()
+    {
+        return Attribute::make(
+            get: fn($value) => (bool)$value
+        );
     }
 }

@@ -20,9 +20,10 @@ class TelegramRequests extends Migration
             $table->date('check_in')->nullable();
             $table->date('check_out')->nullable();
             $table->integer('adults')->nullable();
-            $table->char('is_finished')->default('0');
+            $table->char('is_finished', 1)->default('0');
             $table->unsignedBigInteger('telegram_from_id')->nullable();
             $table->string('status')->default('new');
+            $table->string('last_message');
         });
     }
 

@@ -3,35 +3,11 @@
 namespace App\UseCase\Telegram;
 
 use App\Models\TelegramRequest;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\Workflow\Workflow;
 use ZeroDaHero\LaravelWorkflow\Facades\WorkflowFacade;
 
 class Service
 {
     public const CHOOSE_CITY_MESSAGE = 'Введите название города';
-    public const CHOOSE_CHECK_IN_DATE = 'Выберите дату заселения';
-    public const CHOOSE_CHECK_OUT_DATE = 'Выберите дату отъезда';
-    public const CHOOSE_ADULTS_COUNT = 'Введите количество взрослых';
-
-    public const CITY_ID = 'city_id';
-    public const CHECK_IN = 'check_in';
-    public const CHECK_OUT = 'check_out';
-    public const ADULTS = 'adults';
-
-    public const MESSAGE_SEQUENCE = [
-        self::CITY_ID,
-        self::CHECK_IN,
-        self::CHECK_OUT,
-        self::ADULTS,
-    ];
-
-    public const MESSAGE_BY_COLUMN_LIST = [
-        self::CITY_ID => self::CHOOSE_CITY_MESSAGE,
-        self::CHECK_IN => self::CHOOSE_CHECK_IN_DATE,
-        self::CHECK_OUT => self::CHOOSE_CHECK_OUT_DATE,
-        self::ADULTS => self::CHOOSE_ADULTS_COUNT,
-    ];
 
     public function __construct(private TelegramRequest $entity, private Sender $sender)
     {
@@ -39,42 +15,54 @@ class Service
 
     public function processRequest(int $fromId, string $message)
     {
+        /** @var TelegramRequest */
         $notFinishedTgRequest = $this->entity->findNotFinishedByUserId($fromId);
 
         if (empty($notFinishedTgRequest)) {
             TelegramRequest::create([
                 'status' => TelegramRequest::STATUS_NEW,
                 'telegram_from_id' => $fromId,
+                'last_message' => $message,
             ]);
-            return $this->sender->sendMessage($fromId, self::CHOOSE_CITY_MESSAGE);
+            $this->sender->sendMessage($fromId, self::CHOOSE_CITY_MESSAGE);
+            return true;
         }
 
+        $notFinishedTgRequest->setLastMessage($message);
+
+        /** @var \Symfony\Component\Workflow\Workflow $workflow */
         $workflow = WorkflowFacade::get($notFinishedTgRequest);
 
-        $workflow->apply($notFinishedTgRequest, 'choose_city');
-        Log::debug($notFinishedTgRequest);
+        foreach($workflow->getDefinition()->getTransitions() as $transition) {
+            if(
+                in_array($notFinishedTgRequest->status, $transition->getFroms())
+                && !$workflow->can($notFinishedTgRequest, $transition->getName())
+                && $transitionBlockerList = $workflow->buildTransitionBlockerList($notFinishedTgRequest, $transition->getName())
+            ){
+                /** @var \Symfony\Component\Workflow\TransitionBlocker $blocker */
+                foreach ($transitionBlockerList as $blocker) {
+                    $this->sender->sendMessage($fromId, $blocker->getMessage());
+                    return false;
+                }
+            }
+
+            if ($workflow->can($notFinishedTgRequest, $transition->getName())) {
+                $workflow->apply($notFinishedTgRequest, $transition->getName());
+                break;
+            }
+        }
+
         $notFinishedTgRequest->save();
-    }
 
-    /*private function getActualStep(TelegramRequest $telegramRequest): string
-    {
-        foreach (self::MESSAGE_SEQUENCE as $columnName) {
-            if (empty($telegramRequest->{$columnName})) {
-                return $columnName;
-            }
+        if (empty($transition)) {
+            throw new \Exception('Ошибка при отправке следующего сообщения');
         }
-
-        throw new \Exception('Не удалось получить текущий шаг');
-    }
-
-    private function getActualMessage(TelegramRequest $telegramRequest): string
-    {
-        foreach (self::MESSAGE_SEQUENCE as $columnName) {
-            if (empty($telegramRequest->{$columnName}) && isset(self::MESSAGE_BY_COLUMN_LIST[$columnName])) {
-                return self::MESSAGE_BY_COLUMN_LIST[$columnName];
-            }
+        $transitionMetadata = $workflow->getMetadataStore()->getTransitionMetadata($transition);
+        if (empty($transitionMetadata) || !isset($transitionMetadata['next_message'])) {
+            throw new \Exception('Не задано сообщение для отправки в ТГ');
         }
+        $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
 
-        throw new \Exception('Не удалось получить сообщение для отправки');
-    }*/
+        return true;
+    }
 }

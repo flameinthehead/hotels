@@ -19,4 +19,9 @@ class City extends Model
     {
         return $this->hasOne(OstrovokCity::class);
     }
+
+    public function findByName(string $name): self|null
+    {
+        return self::query()->where('name', $name)->get()->first();
+    }
 }

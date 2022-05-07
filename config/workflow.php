@@ -12,14 +12,23 @@ return [
             'choose_city' => [
                 'from' => 'new',
                 'to' => 'city',
+                'metadata' => [
+                    'next_message' => 'Выберите дату заезда',
+                ]
             ],
             'choose_check_in' => [
                 'from' => 'city',
                 'to' => 'check_in',
+                'metadata' => [
+                    'next_message' => 'Выберите дату отъезда',
+                ]
             ],
             'choose_check_out' => [
                 'from' => 'check_in',
                 'to' => 'check_out',
+                'metadata' => [
+                    'next_message' => 'Введите количество взрослых',
+                ]
             ],
             'choose_adults' => [
                 'from' => 'check_out',

@@ -17,13 +17,12 @@ class TelegramController extends Controller
 
     public function messageHandler(TelegramRequest $request)
     {
+        $fromId = $request->input('message.from.id');
+        $message = $request->input('message.text');
         try {
-            $fromId = $request->input('message.from.id');
-            $message = $request->input('message.text');
-
-            $response = $this->telegramService->processRequest($fromId, $message);
+            $this->telegramService->processRequest($fromId, $message);
         } catch (\Throwable $e) {
-            Log::error('Ошибка во время обработки сообщения от Telegram: '.$e->getMessage());
+            Log::error('Ошибка при обработке ответа от ТГ '.$e->getMessage());
         }
     }
 }
