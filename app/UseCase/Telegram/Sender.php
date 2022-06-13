@@ -28,6 +28,21 @@ class Sender
         $this->makeRequest('sendMessage', $request);
     }
 
+    public function editMessage(int $chatId, int $messageId, string $newMessage, array $buttons = [])
+    {
+        $request = [
+            'chat_id' => $chatId,
+            'message_id' => $messageId,
+            'text' => $newMessage,
+        ];
+
+        if (!empty($buttons)) {
+            $request['reply_markup'] = json_encode(['inline_keyboard' => $buttons]);
+        }
+
+        $this->makeRequest('editMessageText', $request);
+    }
+
     private function makeRequest(string $method, array $params = [])
     {
         $url = sprintf(self::BASE_URL.'%s/%s', env('TELEGRAM_BOT_TOKEN'), $method);

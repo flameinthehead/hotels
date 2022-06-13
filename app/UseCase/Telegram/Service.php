@@ -14,7 +14,7 @@ class Service
     {
     }
 
-    public function processRequest(int $fromId, string $message, string $callBackData = ''): bool
+    public function processRequest(int $fromId, string $message, string $callBackData = '', int $callBackMessageId = null): bool
     {
         /** @var TelegramRequest */
         $notFinishedTgRequest = $this->entity->findNotFinishedByUserId($fromId);
@@ -64,7 +64,22 @@ class Service
         }
         if(!empty($transitionMetadata['needCalendar'])){
             Log::debug('Callback data: '.$callBackData);
-            $this->sender->sendMessage($fromId, $transitionMetadata['next_message'], $this->calendar->makeCalendar($callBackData));
+            Log::debug('Callback message id: '.$callBackMessageId);
+
+            if (!empty($callBackMessageId)) {
+                $this->sender->editMessage(
+                    $fromId,
+                    $callBackMessageId,
+                    $transitionMetadata['next_message'],
+                    $this->calendar->makeCalendar($callBackData)
+                );
+            } else {
+                $this->sender->sendMessage(
+                    $fromId,
+                    $transitionMetadata['next_message'],
+                    $this->calendar->makeCalendar($callBackData)
+                );
+            }
         } else {
             $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
         }
