@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class TelegramRequest extends FormRequest
@@ -14,12 +15,17 @@ class TelegramRequest extends FormRequest
         return true;
     }
 
-    public function rules(): array
+    public function rules(Request $request): array
     {
+        Log::debug($request);
+        $callBackQueryPrefix = '';
+        if ($request->has('callback_query')) {
+            $callBackQueryPrefix = 'callback_query.';
+        }
         return [
-            'message.message_id' => 'required|integer',
-            'message.from.id' => 'required|integer',
-            'message.text' => 'required|string',
+            $callBackQueryPrefix . 'message.message_id' => 'required|integer',
+            $callBackQueryPrefix. 'message.chat.id' => 'required|integer',
+            $callBackQueryPrefix . 'message.text' => 'required|string',
         ];
     }
 

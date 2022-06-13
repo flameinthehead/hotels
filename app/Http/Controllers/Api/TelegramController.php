@@ -17,10 +17,17 @@ class TelegramController extends Controller
 
     public function messageHandler(TelegramRequest $request)
     {
-        $fromId = $request->input('message.from.id');
-        $message = $request->input('message.text');
+        $callBackQueryPrefix = '';
+        $callBackData = '';
+        if ($request->has('callback_query')) {
+            $callBackQueryPrefix = 'callback_query.';
+            $callBackData = $request->input($callBackQueryPrefix.'data');
+        }
+        $fromId = $request->input($callBackQueryPrefix.'message.chat.id');
+        $message = $request->input($callBackQueryPrefix.'message.text');
+
         try {
-            $this->telegramService->processRequest($fromId, $message);
+            $this->telegramService->processRequest($fromId, $message, $callBackData);
         } catch (\Throwable $e) {
             Log::error('Ошибка при обработке ответа от ТГ '.$e->getMessage());
         }

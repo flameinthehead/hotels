@@ -6,7 +6,9 @@ class Calendar
 {
     private array $calendarData = [];
 
-    public const DAY_IN_A_WEEK = 7;
+    private const DAY_IN_A_WEEK = 7;
+    private const NEXT_MONTH_PREFIX = 'next-month';
+    private const PREV_MONTH_PREFIX = 'prev-month';
 
     public const RU_MONTH_LIST = [
         '01' => 'январь',
@@ -33,8 +35,10 @@ class Calendar
         7 => 'Вс',
     ];
 
-    public function makeCalendar(\DateTime $date): array
+    public function makeCalendar(string $callBackData = null): array
     {
+        $date = $this->parseDate($callBackData);
+
         $this->addMonthName($date->format('m'));
         $this->addWeekDayNames();
         $this->addMonthNumbers($date);
@@ -126,15 +130,33 @@ class Calendar
 
     private function addArrows(\DateTime $date)
     {
+
         $this->calendarData[] = [
             [
                 'text' => '<',
-                'callback_data' => 'prev-month-'.$date->modify('-1 month')->format('Y-m-d'),
+                'callback_data' => self::PREV_MONTH_PREFIX . '-' . $date->modify('-1 month')->format('Y-m-d'),
             ],
             [
                 'text' => '>',
-                'callback_data' => 'next-month-'.$date->modify('+1 month')->format('Y-m-d'),
+                'callback_data' => self::NEXT_MONTH_PREFIX . '-' . $date->modify('+2 month')->format('Y-m-d'),
             ],
         ];
+    }
+
+    private function parseDate(string $callBackData = null): \DateTime
+    {
+        if (empty($callBackData)) {
+            return new \DateTime();
+        }
+
+        if (mb_strpos($callBackData, self::PREV_MONTH_PREFIX) !== false) {
+            $dateStr = str_replace(self::PREV_MONTH_PREFIX.'-', '', $callBackData);
+        } elseif(mb_strpos($callBackData, self::NEXT_MONTH_PREFIX) !== false) {
+            $dateStr = str_replace(self::NEXT_MONTH_PREFIX.'-', '', $callBackData);
+        } else {
+            throw new \Exception('Ошибка при парсинге выбранной даты');
+        }
+
+        return new \DateTime($dateStr);
     }
 }

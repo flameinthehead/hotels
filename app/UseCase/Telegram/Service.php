@@ -3,6 +3,7 @@
 namespace App\UseCase\Telegram;
 
 use App\Models\TelegramRequest;
+use Illuminate\Support\Facades\Log;
 use ZeroDaHero\LaravelWorkflow\Facades\WorkflowFacade;
 
 class Service
@@ -13,7 +14,7 @@ class Service
     {
     }
 
-    public function processRequest(int $fromId, string $message)
+    public function processRequest(int $fromId, string $message, string $callBackData = ''): bool
     {
         /** @var TelegramRequest */
         $notFinishedTgRequest = $this->entity->findNotFinishedByUserId($fromId);
@@ -62,7 +63,8 @@ class Service
             throw new \Exception('Не задано сообщение для отправки в ТГ');
         }
         if(!empty($transitionMetadata['needCalendar'])){
-            $this->sender->sendMessage($fromId, $transitionMetadata['next_message'], $this->calendar->makeCalendar(new \DateTime()));
+            Log::debug('Callback data: '.$callBackData);
+            $this->sender->sendMessage($fromId, $transitionMetadata['next_message'], $this->calendar->makeCalendar($callBackData));
         } else {
             $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
         }
