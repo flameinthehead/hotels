@@ -30,6 +30,7 @@ class Service
         }
 
         $notFinishedTgRequest->setLastMessage($message);
+        $notFinishedTgRequest->save();
 
         /** @var \Symfony\Component\Workflow\Workflow $workflow */
         $workflow = WorkflowFacade::get($notFinishedTgRequest);
@@ -54,6 +55,7 @@ class Service
         }
 
         $notFinishedTgRequest->save();
+
 
         if (empty($transition)) {
             throw new \Exception('Ошибка при отправке следующего сообщения');

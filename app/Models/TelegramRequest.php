@@ -69,7 +69,7 @@ class TelegramRequest extends Model
         return $this->belongsTo(City::class);
     }
 
-    public function findNotFinishedByUserId(int $telegramUserId)
+    public function findNotFinishedByUserId(int $telegramUserId): ?self
     {
         return self::query()->notFinished()->where('telegram_from_id', $telegramUserId)->first();
     }
@@ -81,12 +81,12 @@ class TelegramRequest extends Model
 
     public function setLastMessage(string $lastMessage): void
     {
-        $this->lastMessage = $lastMessage;
+        $this->attributes['last_message'] = $lastMessage;
     }
 
     public function getLastMessage(): string
     {
-        return $this->lastMessage;
+        return $this->last_message;
     }
 
     public function getStatus(): string
