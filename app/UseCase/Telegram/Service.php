@@ -9,7 +9,7 @@ class Service
 {
     public const CHOOSE_CITY_MESSAGE = 'Введите название города';
 
-    public function __construct(private TelegramRequest $entity, private Sender $sender)
+    public function __construct(private TelegramRequest $entity, private Sender $sender, private Calendar $calendar)
     {
     }
 
@@ -61,7 +61,12 @@ class Service
         if (empty($transitionMetadata) || !isset($transitionMetadata['next_message'])) {
             throw new \Exception('Не задано сообщение для отправки в ТГ');
         }
-        $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
+        if(!empty($transitionMetadata['needCalendar'])){
+            $this->sender->sendMessage($fromId, $transitionMetadata['next_message'], $this->calendar->makeCalendar(new \DateTime()));
+        } else {
+            $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
+        }
+
 
         return true;
     }

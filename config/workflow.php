@@ -14,6 +14,7 @@ return [
                 'to' => 'city',
                 'metadata' => [
                     'next_message' => 'Выберите дату заезда',
+                    'needCalendar' => true,
                 ]
             ],
             'choose_check_in' => [
@@ -21,6 +22,7 @@ return [
                 'to' => 'check_in',
                 'metadata' => [
                     'next_message' => 'Выберите дату отъезда',
+                    'needCalendar' => true,
                 ]
             ],
             'choose_check_out' => [
