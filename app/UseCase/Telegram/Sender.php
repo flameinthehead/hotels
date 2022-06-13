@@ -4,6 +4,7 @@ namespace App\UseCase\Telegram;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Facades\Log;
 
 class Sender
 {
@@ -13,18 +14,25 @@ class Sender
     {
     }
 
-    public function sendMessage(int $chatId, string $message)
+    public function sendMessage(int $chatId, string $message, array $buttons = [])
     {
-        $this->makeRequest('sendMessage', [
+        $request = [
             'chat_id' => $chatId,
             'text' => $message,
-        ]);
+        ];
+
+        if (!empty($buttons)) {
+            $request['reply_markup'] = json_encode(['inline_keyboard' => $buttons]);
+        }
+
+        $this->makeRequest('sendMessage', $request);
     }
 
     private function makeRequest(string $method, array $params = [])
     {
         $url = sprintf(self::BASE_URL.'%s/%s', env('TELEGRAM_BOT_TOKEN'), $method);
 
+        Log::debug('Send request '.json_encode($params));
         $response = $this->client->post($url, [
             RequestOptions::JSON => !empty($params) ? $params : []
         ]);
