@@ -29,7 +29,12 @@ class Service
             return true;
         }
 
-        $notFinishedTgRequest->setLastMessage($message);
+        if (!empty($callBackData)) {
+            $notFinishedTgRequest->setLastMessage($callBackData);
+        } else {
+            $notFinishedTgRequest->setLastMessage($message);
+        }
+
         $notFinishedTgRequest->save();
 
         /** @var \Symfony\Component\Workflow\Workflow $workflow */
