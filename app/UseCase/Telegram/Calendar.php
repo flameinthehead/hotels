@@ -9,6 +9,7 @@ class Calendar
     private const DAY_IN_A_WEEK = 7;
     private const NEXT_MONTH_PREFIX = 'next-month';
     private const PREV_MONTH_PREFIX = 'prev-month';
+    private const SELECTED_DATE_PREFIX = 'select-date';
 
     public const RU_MONTH_LIST = [
         '01' => 'январь',
@@ -47,6 +48,11 @@ class Calendar
         return $this->calendarData;
     }
 
+    public function isSelectedDate(string $callBackData): bool
+    {
+        return mb_strpos($callBackData, self::SELECTED_DATE_PREFIX) !== false;
+    }
+
     private function addMonthName(string $monthName): void
     {
         $this->calendarData[] = [
@@ -83,7 +89,7 @@ class Calendar
                 if($monthDayNumber == $day) {
                     $row[] = [
                         'text' => $monthDay->format('j'),
-                        'callback_data' => $monthDay->format('d.m.Y'),
+                        'callback_data' => self::SELECTED_DATE_PREFIX.'-'.$monthDay->format('d.m.Y'),
                     ];
                     $isPushedFirstNumber = true;
                     break;

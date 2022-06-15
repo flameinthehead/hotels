@@ -4,6 +4,8 @@ namespace App\UseCase\Telegram;
 
 use App\Models\TelegramRequest;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\Workflow;
 use ZeroDaHero\LaravelWorkflow\Facades\WorkflowFacade;
 
 class Service
@@ -16,16 +18,8 @@ class Service
 
     public function processRequest(int $fromId, string $message, string $callBackData = '', int $callBackMessageId = null): bool
     {
-        /** @var TelegramRequest */
-        $notFinishedTgRequest = $this->entity->findNotFinishedByUserId($fromId);
-
-        if (empty($notFinishedTgRequest)) {
-            TelegramRequest::create([
-                'status' => TelegramRequest::STATUS_NEW,
-                'telegram_from_id' => $fromId,
-                'last_message' => $message,
-            ]);
-            $this->sender->sendMessage($fromId, self::CHOOSE_CITY_MESSAGE);
+        $notFinishedTgRequest = $this->findTgRequest($fromId, $message);
+        if (!$notFinishedTgRequest) {
             return true;
         }
 
@@ -40,16 +34,55 @@ class Service
         /** @var \Symfony\Component\Workflow\Workflow $workflow */
         $workflow = WorkflowFacade::get($notFinishedTgRequest);
 
+        if (!$transition = $this->processWorkflow($workflow, $notFinishedTgRequest, $fromId, $callBackData)) {
+            return false;
+        }
+
+        $transitionMetadata = $workflow->getMetadataStore()->getTransitionMetadata($transition);
+
+        $this->sendFinalMessage($transitionMetadata, $fromId, $message, $callBackData, $callBackMessageId);
+
+        return true;
+    }
+
+    private function findTgRequest(int $fromId, string $message): ?TelegramRequest
+    {
+        $notFinishedTgRequest = $this->entity->findNotFinishedByUserId($fromId);
+
+        if (empty($notFinishedTgRequest)) {
+            TelegramRequest::create([
+                'status' => TelegramRequest::STATUS_NEW,
+                'telegram_from_id' => $fromId,
+                'last_message' => $message,
+            ]);
+            $this->sender->sendMessage($fromId, self::CHOOSE_CITY_MESSAGE);
+        }
+
+        return $notFinishedTgRequest;
+    }
+
+    private function processWorkflow(
+        Workflow $workflow,
+        TelegramRequest $notFinishedTgRequest,
+        int $fromId,
+        string $callBackData = ''
+    ): ?Transition
+    {
+        $transition = null;
         foreach($workflow->getDefinition()->getTransitions() as $transition) {
             if(
-                in_array($notFinishedTgRequest->status, $transition->getFroms())
+                in_array($notFinishedTgRequest->getStatus(), $transition->getFroms())
                 && !$workflow->can($notFinishedTgRequest, $transition->getName())
                 && $transitionBlockerList = $workflow->buildTransitionBlockerList($notFinishedTgRequest, $transition->getName())
             ){
+                if (!$this->calendar->isSelectedDate($callBackData)) {
+                    return $transition;
+                }
+
                 /** @var \Symfony\Component\Workflow\TransitionBlocker $blocker */
                 foreach ($transitionBlockerList as $blocker) {
                     $this->sender->sendMessage($fromId, $blocker->getMessage());
-                    return false;
+                    return null;
                 }
             }
 
@@ -60,38 +93,39 @@ class Service
         }
 
         $notFinishedTgRequest->save();
+        return $transition;
+    }
 
-
-        if (empty($transition)) {
-            throw new \Exception('Ошибка при отправке следующего сообщения');
-        }
-        $transitionMetadata = $workflow->getMetadataStore()->getTransitionMetadata($transition);
+    private function sendFinalMessage(
+        array $transitionMetadata,
+        int $fromId,
+        string $prevMessage,
+        string $callBackData = '',
+        int $callBackMessageId = null
+    ): void
+    {
         if (empty($transitionMetadata) || !isset($transitionMetadata['next_message'])) {
             throw new \Exception('Не задано сообщение для отправки в ТГ');
         }
-        if(!empty($transitionMetadata['needCalendar'])){
-            Log::debug('Callback data: '.$callBackData);
-            Log::debug('Callback message id: '.$callBackMessageId);
-
-            if (!empty($callBackMessageId)) {
-                $this->sender->editMessage(
-                    $fromId,
-                    $callBackMessageId,
-                    $transitionMetadata['next_message'],
-                    $this->calendar->makeCalendar($callBackData)
-                );
-            } else {
-                $this->sender->sendMessage(
-                    $fromId,
-                    $transitionMetadata['next_message'],
-                    $this->calendar->makeCalendar($callBackData)
-                );
-            }
-        } else {
+        if (empty($transitionMetadata['needCalendar'])) {
             $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
+            return;
         }
 
+        if (!empty($callBackMessageId)) {
+            $this->sender->editMessage(
+                $fromId,
+                $callBackMessageId,
+                $prevMessage,
+                $this->calendar->makeCalendar($callBackData)
+            );
+            return;
+        }
 
-        return true;
+        $this->sender->sendMessage(
+            $fromId,
+            $transitionMetadata['next_message'],
+            $this->calendar->makeCalendar($callBackData)
+        );
     }
 }

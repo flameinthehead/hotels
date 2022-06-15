@@ -17,7 +17,6 @@ class TelegramRequest extends FormRequest
 
     public function rules(Request $request): array
     {
-        Log::debug($request);
         $callBackQueryPrefix = '';
         if ($request->has('callback_query')) {
             $callBackQueryPrefix = 'callback_query.';
