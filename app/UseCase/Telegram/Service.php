@@ -75,7 +75,8 @@ class Service
                 && !$workflow->can($notFinishedTgRequest, $transition->getName())
                 && $transitionBlockerList = $workflow->buildTransitionBlockerList($notFinishedTgRequest, $transition->getName())
             ){
-                if (!$this->calendar->isSelectedDate($callBackData)) {
+                if (!empty($callBackData) && !$this->calendar->isSelectedDate($callBackData)) {
+                    Log::debug('Transition: '.var_export($transition, true));
                     return $transition;
                 }
 
@@ -87,6 +88,7 @@ class Service
             }
 
             if ($workflow->can($notFinishedTgRequest, $transition->getName())) {
+                Log::debug('Transition name: '.$transition->getName());
                 $workflow->apply($notFinishedTgRequest, $transition->getName());
                 break;
             }
@@ -104,21 +106,24 @@ class Service
         int $callBackMessageId = null
     ): void
     {
+        Log::debug('Transition metadata: '.var_export($transitionMetadata, true));
         if (empty($transitionMetadata) || !isset($transitionMetadata['next_message'])) {
             throw new \Exception('Не задано сообщение для отправки в ТГ');
         }
-        if (empty($transitionMetadata['needCalendar'])) {
-            $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
-            return;
-        }
 
-        if (!empty($callBackMessageId)) {
+        if (!empty($callBackMessageId) && !$this->calendar->isSelectedDate($callBackData)) {
             $this->sender->editMessage(
                 $fromId,
                 $callBackMessageId,
                 $prevMessage,
                 $this->calendar->makeCalendar($callBackData)
             );
+            return;
+        }
+
+
+        if (empty($transitionMetadata['needCalendar'])) {
+            $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
             return;
         }
 

@@ -94,6 +94,16 @@ class TelegramRequest extends Model
         return $this->status;
     }
 
+    public function setCheckInDate(\DateTime $checkInDate): void
+    {
+        $this->attributes['check_in'] = $checkInDate;
+    }
+
+    public function setCheckOutDate(\DateTime $checkOutDate): void
+    {
+        $this->attributes['check_out'] = $checkOutDate;
+    }
+
     protected function isFinished()
     {
         return Attribute::make(

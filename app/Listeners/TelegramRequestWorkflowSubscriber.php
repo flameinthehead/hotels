@@ -7,6 +7,7 @@ use App\Models\TelegramRequest;
 use App\UseCase\Telegram\Calendar;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Log;
+use ZeroDaHero\LaravelWorkflow\Events\CompletedEvent;
 use Symfony\Component\Workflow\TransitionBlocker;
 use ZeroDaHero\LaravelWorkflow\Events\GuardEvent;
 
@@ -35,8 +36,29 @@ class TelegramRequestWorkflowSubscriber
         );
 
         $events->listen(
+            'workflow.telegram_request.completed.choose_city',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onCompletedChooseCity'],
+        );
+
+
+        $events->listen(
             'workflow.telegram_request.guard.choose_check_in',
             [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onGuardChooseCheckIn'],
+        );
+
+        $events->listen(
+            'workflow.telegram_request.completed.choose_check_in',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onCompletedChooseCheckIn'],
+        );
+
+        $events->listen(
+            'workflow.telegram_request.guard.choose_check_out',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onGuardChooseCheckOut'],
+        );
+
+        $events->listen(
+            'workflow.telegram_request.completed.choose_check_out',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onCompletedChooseCheckOut'],
         );
     }
 
@@ -51,7 +73,12 @@ class TelegramRequestWorkflowSubscriber
                 new TransitionBlocker('Город не найден. Попробуйте ввести другой город.', '403')
             );
         }
+    }
 
+    public function onCompletedChooseCity(CompletedEvent $event): void
+    {
+        $telegramRequest = $event->getSubject();
+        $city = (new City())->findByName($telegramRequest->getLastMessage());
         $telegramRequest->city()->associate($city);
     }
 
@@ -59,11 +86,33 @@ class TelegramRequestWorkflowSubscriber
     {
         /** @var TelegramRequest $telegramRequest */
         $telegramRequest = $event->getSubject();
-        Log::debug('onGuardChooseCheckIn '.json_encode($event->getSubject()));
-        Log::debug('last message: '.$telegramRequest->getLastMessage());
 
         if (!$this->calendar->isSelectedDate($telegramRequest->getLastMessage())) {
             $event->setBlocked(true);
         }
+    }
+
+    public function onCompletedChooseCheckIn(CompletedEvent $event): void
+    {
+        /** @var TelegramRequest $telegramRequest */
+        $telegramRequest = $event->getSubject();
+        $telegramRequest->setCheckInDate($this->calendar->parseDate($telegramRequest->getLastMessage()));
+    }
+
+    public function onGuardChooseCheckOut(GuardEvent $event): void
+    {
+        /** @var TelegramRequest $telegramRequest */
+        $telegramRequest = $event->getSubject();
+        Log::debug('LAST MESSAGE: '.$telegramRequest->getLastMessage());
+
+        if (!$this->calendar->isSelectedDate($telegramRequest->getLastMessage())) {
+            $event->setBlocked(true);
+        }
+    }
+
+    public function onCompletedChooseCheckOut(CompletedEvent $event): void
+    {
+        $telegramRequest = $event->getSubject();
+        $telegramRequest->setCheckOutDate($this->calendar->parseDate($telegramRequest->getLastMessage()));
     }
 }

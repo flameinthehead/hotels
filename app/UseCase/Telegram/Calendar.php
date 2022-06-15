@@ -53,6 +53,25 @@ class Calendar
         return mb_strpos($callBackData, self::SELECTED_DATE_PREFIX) !== false;
     }
 
+    public function parseDate(string $callBackData = null): \DateTime
+    {
+        if (empty($callBackData)) {
+            return new \DateTime();
+        }
+
+        if (mb_strpos($callBackData, self::PREV_MONTH_PREFIX) !== false) {
+            $dateStr = str_replace(self::PREV_MONTH_PREFIX.'-', '', $callBackData);
+        } elseif(mb_strpos($callBackData, self::NEXT_MONTH_PREFIX) !== false) {
+            $dateStr = str_replace(self::NEXT_MONTH_PREFIX . '-', '', $callBackData);
+        } elseif(mb_strpos($callBackData, self::SELECTED_DATE_PREFIX) !== false) {
+            $dateStr = str_replace(self::SELECTED_DATE_PREFIX . '-', '', $callBackData);
+        } else {
+            throw new \Exception('Ошибка при парсинге выбранной даты');
+        }
+
+        return new \DateTime($dateStr);
+    }
+
     private function addMonthName(string $monthName): void
     {
         $this->calendarData[] = [
@@ -147,22 +166,5 @@ class Calendar
                 'callback_data' => self::NEXT_MONTH_PREFIX . '-' . $date->modify('+2 month')->format('Y-m-d'),
             ],
         ];
-    }
-
-    private function parseDate(string $callBackData = null): \DateTime
-    {
-        if (empty($callBackData)) {
-            return new \DateTime();
-        }
-
-        if (mb_strpos($callBackData, self::PREV_MONTH_PREFIX) !== false) {
-            $dateStr = str_replace(self::PREV_MONTH_PREFIX.'-', '', $callBackData);
-        } elseif(mb_strpos($callBackData, self::NEXT_MONTH_PREFIX) !== false) {
-            $dateStr = str_replace(self::NEXT_MONTH_PREFIX.'-', '', $callBackData);
-        } else {
-            throw new \Exception('Ошибка при парсинге выбранной даты');
-        }
-
-        return new \DateTime($dateStr);
     }
 }
