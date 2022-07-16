@@ -36,8 +36,10 @@ class TelegramController extends Controller
             if (!empty($requestParams) && $requestParams instanceof Params) {
                 $this->sender->sendMessage($fromId, 'Пожалуйста, подождите, выполняется поиск...');
                 $results = $this->searchService->searchByParams($requestParams);
-                $this->sender->sendMessage($fromId, 'Поиск завершён.');
-                $this->telegramService->sendResults($fromId, $results);
+                $this->sender->sendMessage($fromId, 'Поиск завершён'.(empty($results) ? ' - ничего не найдено' : '').'.');
+                if (!empty($results)) {
+                    $this->telegramService->sendResults($fromId, $results);
+                }
             }
         } catch (\Throwable $e) {
             Log::error('Ошибка при обработке ответа от ТГ '.$e->getMessage(), $e->getTrace());

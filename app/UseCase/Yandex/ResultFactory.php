@@ -8,7 +8,8 @@ use App\UseCase\Search\SearchResultFactory;
 
 class ResultFactory implements SearchResultFactory
 {
-    const BASE_RESULT_URL = 'https://travel.yandex.ru/hotels/';
+    public const BASE_RESULT_URL = 'https://travel.yandex.ru/hotels/';
+    public const OPTIMAL_PREVIEW_SIZE = 'M';
 
     public static function makeResult(array $searchResult, SearchParamsFactoryInterface $params): ?Result
     {
@@ -60,6 +61,9 @@ class ResultFactory implements SearchResultFactory
         $images = $searchResult['hotel']['images'];
         if (!empty($images)) {
             $firstImage = reset($images);
+            $firstImage['sizes'] = array_filter($firstImage['sizes'], function ($size) {
+                return $size['size'] === self::OPTIMAL_PREVIEW_SIZE;
+            });
             $preview = sprintf($firstImage['urlTemplate'], reset($firstImage['sizes'])['size']);
             $result->setHotelPreview($preview);
         }

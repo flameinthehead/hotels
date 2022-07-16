@@ -47,7 +47,18 @@ class Sender
         $this->makeRequest('editMessageText', $request);
     }
 
-    private function makeRequest(string $method, array $params = [])
+    public function sendPhoto(int $chatId, string $photoUrl, string $caption): void
+    {
+        $request = [
+            'chat_id' => $chatId,
+            'photo' => $photoUrl,
+            'caption' => $caption,
+        ];
+
+        $this->makeRequest('sendPhoto', $request);
+    }
+
+    private function makeRequest(string $method, array $params = []): bool
     {
         $url = sprintf(self::BASE_URL.'%s/%s', env('TELEGRAM_BOT_TOKEN'), $method);
 

@@ -91,4 +91,9 @@ class TelegramRequest extends Model
     {
         return $this->check_out;
     }
+
+    public function setIsFinished(bool $isFinished): void
+    {
+        $this->is_finished = $isFinished;
+    }
 }

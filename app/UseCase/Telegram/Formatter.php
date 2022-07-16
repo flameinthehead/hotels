@@ -29,7 +29,7 @@ class Formatter
                 ),
             ];
 
-            $messages[] = implode("\r\n\r\n", $messageData);
+            $messages[$oneResult->getHotelPreview()] = implode("\r\n\r\n", $messageData);
         }
 
         return $messages;

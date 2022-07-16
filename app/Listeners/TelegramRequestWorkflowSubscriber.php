@@ -139,5 +139,6 @@ class TelegramRequestWorkflowSubscriber
         /** @var TelegramRequest $telegramRequest */
         $telegramRequest = $event->getSubject();
         $telegramRequest->setAdults($telegramRequest->getLastMessage());
+        $telegramRequest->setIsFinished(true);
     }
 }

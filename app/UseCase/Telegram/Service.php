@@ -65,8 +65,8 @@ class Service
         }
 
         $count = 0;
-        foreach ($messages as $message) {
-            $this->sender->sendMessage($chatId, $message);
+        foreach ($messages as $photoUrl => $message) {
+            $this->sender->sendPhoto($chatId, $photoUrl, $message);
             ++$count;
             if ($count == 10) { // @TODO пагинация
                 break;
