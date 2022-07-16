@@ -35,6 +35,9 @@ return [
             'choose_adults' => [
                 'from' => 'check_out',
                 'to' => 'adults',
+                'metadata' => [
+                    'is_final_message' => true
+                ],
             ]
         ],
     ],

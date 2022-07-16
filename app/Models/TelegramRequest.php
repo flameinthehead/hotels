@@ -110,4 +110,14 @@ class TelegramRequest extends Model
             get: fn($value) => (bool)$value
         );
     }
+
+    public function setAdults(int $adults): void
+    {
+        $this->adults = $adults;
+    }
+
+    public function getAdults(): int
+    {
+        return $this->adults;
+    }
 }

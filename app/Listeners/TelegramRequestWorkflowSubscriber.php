@@ -60,6 +60,16 @@ class TelegramRequestWorkflowSubscriber
             'workflow.telegram_request.completed.choose_check_out',
             [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onCompletedChooseCheckOut'],
         );
+
+        $events->listen(
+            'workflow.telegram_request.guard.choose_adults',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onGuardChooseAdults'],
+        );
+
+        $events->listen(
+            'workflow.telegram_request.completed.choose_adults',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onCompletedChooseAdults'],
+        );
     }
 
     public function onGuardChooseCity(GuardEvent $event): void
@@ -114,5 +124,22 @@ class TelegramRequestWorkflowSubscriber
     {
         $telegramRequest = $event->getSubject();
         $telegramRequest->setCheckOutDate($this->calendar->parseDate($telegramRequest->getLastMessage()));
+    }
+
+    public function onGuardChooseAdults(GuardEvent $event): void
+    {
+        $telegramRequest = $event->getSubject();
+        if (!is_numeric($telegramRequest->getLastMessage())) {
+            $event->addTransitionBlocker(
+                new TransitionBlocker('Необходимо ввести число', '403')
+            );
+        }
+    }
+
+    public function onCompletedChooseAdults(CompletedEvent $event): void
+    {
+        /** @var TelegramRequest $telegramRequest */
+        $telegramRequest = $event->getSubject();
+        $telegramRequest->setAdults($telegramRequest->getLastMessage());
     }
 }

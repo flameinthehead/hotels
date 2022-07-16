@@ -16,8 +16,12 @@ class Service
     {
     }
 
-    public function processRequest(int $fromId, string $message, string $callBackData = '', int $callBackMessageId = null): bool
-    {
+    public function processRequest(
+        int $fromId,
+        string $message,
+        string $callBackData = '',
+        int $callBackMessageId = null
+    ): TelegramRequest|bool {
         $notFinishedTgRequest = $this->findTgRequest($fromId, $message);
         if (!$notFinishedTgRequest) {
             return true;
@@ -39,6 +43,9 @@ class Service
         }
 
         $transitionMetadata = $workflow->getMetadataStore()->getTransitionMetadata($transition);
+        if (isset($transitionMetadata['is_final_message']) && $transitionMetadata['is_final_message'] === true) {
+            return $notFinishedTgRequest;
+        }
 
         $this->sendFinalMessage($transitionMetadata, $fromId, $message, $callBackData, $callBackMessageId);
 
@@ -107,6 +114,8 @@ class Service
     ): void
     {
         Log::debug('Transition metadata: '.var_export($transitionMetadata, true));
+
+
         if (empty($transitionMetadata) || !isset($transitionMetadata['next_message'])) {
             throw new \Exception('Не задано сообщение для отправки в ТГ');
         }
