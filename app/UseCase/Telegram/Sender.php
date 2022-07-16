@@ -12,7 +12,7 @@ class Sender
     public const DISABLE_WEB_PAGE_PREVIEW = 'disable_web_page_preview';
     public const IS_DISABLED_LINK_PREVIEW = true;
     public const PARSE_MODE_FIELD = 'parse_mode';
-    public const PARSE_MODE_VALUE = 'markdown';
+    public const PARSE_MODE_VALUE = 'html';
 
     public function __construct(private Client $client)
     {
