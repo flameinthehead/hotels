@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TelegramRequest;
+use App\UseCase\Search\Params;
+use App\UseCase\Search\Search;
 use App\UseCase\Telegram\Service;
 use Illuminate\Support\Facades\Log;
 
@@ -11,7 +13,7 @@ class TelegramController extends Controller
 {
 
 
-    public function __construct(private Service $telegramService)
+    public function __construct(private Service $telegramService, private Search $searchService)
     {
     }
 
@@ -29,7 +31,10 @@ class TelegramController extends Controller
         $message = $request->input($callBackQueryPrefix.'message.text');
 
         try {
-            $this->telegramService->processRequest($fromId, $message, $callBackData, $callBackMessageId);
+            $requestParams = $this->telegramService->processRequest($fromId, $message, $callBackData, $callBackMessageId);
+            if (!empty($requestParams) && $requestParams instanceof Params) {
+                $this->searchService->searchByParams($requestParams);
+            }
         } catch (\Throwable $e) {
             Log::error('Ошибка при обработке ответа от ТГ '.$e->getMessage());
         }

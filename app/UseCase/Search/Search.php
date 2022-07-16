@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 
 class Search
 {
-    private ?string $source = null;
+    private ?string $source;
 
     public function __construct(private Proxy $proxy, private Proxy $lastProxy, private Sorter $sorter)
     {
@@ -18,14 +18,17 @@ class Search
 
     public function search(SearchRequest $request): array
     {
+        return $this->searchByParams($this->prepareParams($request));
+    }
+
+    public function searchByParams(Params $params): array
+    {
+        $searchResults = collect([]);
+
         $searchSources = config('search_sources');
         if (empty($searchSources)) {
             throw new \Exception('Не заданы источники поиска');
         }
-
-        $params = $this->prepareParams($request);
-
-        $searchResults = collect([]);
 
         foreach ($searchSources as $source) {
             $this->source = $source;

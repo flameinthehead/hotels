@@ -120,4 +120,19 @@ class TelegramRequest extends Model
     {
         return $this->adults;
     }
+
+    public function getCity(): City
+    {
+        return $this->city;
+    }
+
+    public function getCheckInDate(): \DateTime
+    {
+        return $this->checkIn;
+    }
+
+    public function getCheckOutDate(): \DateTime
+    {
+        return $this->checkOut;
+    }
 }

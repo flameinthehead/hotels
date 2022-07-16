@@ -30,7 +30,7 @@ class Params
         return $this->checkOutDate;
     }
 
-    public function getAdults()
+    public function getAdults(): int
     {
         return $this->adults;
     }

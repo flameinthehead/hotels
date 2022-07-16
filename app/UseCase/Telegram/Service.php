@@ -3,6 +3,8 @@
 namespace App\UseCase\Telegram;
 
 use App\Models\TelegramRequest;
+use App\UseCase\Search\Params;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
@@ -21,7 +23,7 @@ class Service
         string $message,
         string $callBackData = '',
         int $callBackMessageId = null
-    ): TelegramRequest|bool {
+    ): Params|bool {
         $notFinishedTgRequest = $this->findTgRequest($fromId, $message);
         if (!$notFinishedTgRequest) {
             return true;
@@ -44,7 +46,7 @@ class Service
 
         $transitionMetadata = $workflow->getMetadataStore()->getTransitionMetadata($transition);
         if (isset($transitionMetadata['is_final_message']) && $transitionMetadata['is_final_message'] === true) {
-            return $notFinishedTgRequest;
+            return $this->getSearchParamsByTelegramRequest($notFinishedTgRequest);
         }
 
         $this->sendFinalMessage($transitionMetadata, $fromId, $message, $callBackData, $callBackMessageId);
@@ -141,5 +143,16 @@ class Service
             $transitionMetadata['next_message'],
             $this->calendar->makeCalendar($callBackData)
         );
+    }
+
+    private function getSearchParamsByTelegramRequest(TelegramRequest $tgRequest): Params
+    {
+        $params = new Params();
+        $params->setCity($tgRequest->getCity());
+        $params->setCheckInDate(Carbon::make($tgRequest->getCheckInDate()->format('Y-m-d H:i:s')));
+        $params->setCheckOutDate(Carbon::make($tgRequest->getCheckOutDate()->format('Y-m-d H:i:s')));
+        $params->setAdults($tgRequest->getAdults());
+
+        return $params;
     }
 }
