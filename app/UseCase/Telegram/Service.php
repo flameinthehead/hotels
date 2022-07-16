@@ -5,7 +5,6 @@ namespace App\UseCase\Telegram;
 use App\Models\TelegramRequest;
 use App\UseCase\Search\Params;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 use ZeroDaHero\LaravelWorkflow\Facades\WorkflowFacade;
@@ -14,8 +13,12 @@ class Service
 {
     public const CHOOSE_CITY_MESSAGE = 'Введите название города';
 
-    public function __construct(private TelegramRequest $entity, private Sender $sender, private Calendar $calendar)
-    {
+    public function __construct(
+        private TelegramRequest $entity,
+        private Sender $sender,
+        private Calendar $calendar,
+        private Formatter $formatter
+    ) {
     }
 
     public function processRequest(
@@ -54,6 +57,23 @@ class Service
         return true;
     }
 
+    public function sendResults(int $chatId, array $results): void
+    {
+        $messages = $this->formatter->formatSearchResults($results);
+        if (empty($messages)) {
+            return;
+        }
+
+        $count = 0;
+        foreach ($messages as $message) {
+            $this->sender->sendMessage($chatId, $message);
+            ++$count;
+            if ($count == 10) { // @TODO пагинация
+                break;
+            }
+        }
+    }
+
     private function findTgRequest(int $fromId, string $message): ?TelegramRequest
     {
         $notFinishedTgRequest = $this->entity->findNotFinishedByUserId($fromId);
@@ -85,7 +105,6 @@ class Service
                 && $transitionBlockerList = $workflow->buildTransitionBlockerList($notFinishedTgRequest, $transition->getName())
             ){
                 if (!empty($callBackData) && !$this->calendar->isSelectedDate($callBackData)) {
-                    Log::debug('Transition: '.var_export($transition, true));
                     return $transition;
                 }
 
@@ -97,7 +116,6 @@ class Service
             }
 
             if ($workflow->can($notFinishedTgRequest, $transition->getName())) {
-                Log::debug('Transition name: '.$transition->getName());
                 $workflow->apply($notFinishedTgRequest, $transition->getName());
                 break;
             }
@@ -115,9 +133,6 @@ class Service
         int $callBackMessageId = null
     ): void
     {
-        Log::debug('Transition metadata: '.var_export($transitionMetadata, true));
-
-
         if (empty($transitionMetadata) || !isset($transitionMetadata['next_message'])) {
             throw new \Exception('Не задано сообщение для отправки в ТГ');
         }
@@ -149,8 +164,8 @@ class Service
     {
         $params = new Params();
         $params->setCity($tgRequest->getCity());
-        $params->setCheckInDate(Carbon::make($tgRequest->getCheckInDate()->format('Y-m-d H:i:s')));
-        $params->setCheckOutDate(Carbon::make($tgRequest->getCheckOutDate()->format('Y-m-d H:i:s')));
+        $params->setCheckInDate(Carbon::make($tgRequest->getCheckInDate()));
+        $params->setCheckOutDate(Carbon::make($tgRequest->getCheckOutDate()));
         $params->setAdults($tgRequest->getAdults());
 
         return $params;

@@ -9,12 +9,16 @@ use Illuminate\Support\Facades\Log;
 class Sender
 {
     public const BASE_URL = 'https://api.telegram.org/bot';
+    public const DISABLE_WEB_PAGE_PREVIEW = 'disable_web_page_preview';
+    public const IS_DISABLED_LINK_PREVIEW = true;
+    public const PARSE_MODE_FIELD = 'parse_mode';
+    public const PARSE_MODE_VALUE = 'markdown';
 
     public function __construct(private Client $client)
     {
     }
 
-    public function sendMessage(int $chatId, string $message, array $buttons = [])
+    public function sendMessage(int $chatId, string $message, array $buttons = []): void
     {
         $request = [
             'chat_id' => $chatId,
@@ -47,7 +51,11 @@ class Sender
     {
         $url = sprintf(self::BASE_URL.'%s/%s', env('TELEGRAM_BOT_TOKEN'), $method);
 
-        Log::debug('Send request '.json_encode($params));
+        Log::debug('Send request '.json_encode($params, JSON_UNESCAPED_UNICODE));
+
+        $params[self::DISABLE_WEB_PAGE_PREVIEW] = self::IS_DISABLED_LINK_PREVIEW;
+        $params[self::PARSE_MODE_FIELD] = self::PARSE_MODE_VALUE;
+
         $response = $this->client->post($url, [
             RequestOptions::JSON => !empty($params) ? $params : []
         ]);

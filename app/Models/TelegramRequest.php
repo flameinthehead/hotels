@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
 use ZeroDaHero\LaravelWorkflow\Traits\WorkflowTrait;
 
 class TelegramRequest extends Model
@@ -16,51 +17,6 @@ class TelegramRequest extends Model
     public const STATUS_CHECK_IN = 'check_in';
     public const STATUS_CHECK_OUT = 'check_out';
     public const STATUS_ADULTS = 'adults';
-
-
-    private int $id;
-
-    /**
-     * Город
-     * @var City
-     */
-    private City $city;
-
-    /**
-     * Дата заезда
-     * @var \DateTime
-     */
-    private \DateTime $checkIn;
-
-    /**
-     * Дата выезда
-     * @var \DateTime
-     */
-    private \DateTime $checkOut;
-
-    /**
-     * Количество взрослых
-     * @var int
-     */
-    private int $adults;
-
-    /**
-     * Оконченный запрос (когда выведены результаты поиска)
-     * @var bool
-     */
-    private bool $isFinished;
-
-    /**
-     * Последнее сообщение, отправленное боту от пользователя
-     * @var string
-     */
-    private string $lastMessage;
-
-    /**
-     * Id пользователя в ТГ
-     * @var int
-     */
-    private int $telegramFromId;
 
     protected $guarded = ['id'];
 
@@ -74,7 +30,7 @@ class TelegramRequest extends Model
         return self::query()->notFinished()->where('telegram_from_id', $telegramUserId)->first();
     }
 
-    public function scopeNotFinished($builder)
+    public function scopeNotFinished(Builder $builder): Builder
     {
         return $builder->where('is_finished', '0');
     }
@@ -126,13 +82,13 @@ class TelegramRequest extends Model
         return $this->city;
     }
 
-    public function getCheckInDate(): \DateTime
+    public function getCheckInDate(): string
     {
-        return $this->checkIn;
+        return $this->check_in;
     }
 
-    public function getCheckOutDate(): \DateTime
+    public function getCheckOutDate(): string
     {
-        return $this->checkOut;
+        return $this->check_out;
     }
 }

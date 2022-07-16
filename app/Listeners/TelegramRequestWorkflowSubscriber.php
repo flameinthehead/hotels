@@ -6,7 +6,6 @@ use App\Models\City;
 use App\Models\TelegramRequest;
 use App\UseCase\Telegram\Calendar;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Facades\Log;
 use ZeroDaHero\LaravelWorkflow\Events\CompletedEvent;
 use Symfony\Component\Workflow\TransitionBlocker;
 use ZeroDaHero\LaravelWorkflow\Events\GuardEvent;
@@ -113,7 +112,6 @@ class TelegramRequestWorkflowSubscriber
     {
         /** @var TelegramRequest $telegramRequest */
         $telegramRequest = $event->getSubject();
-        Log::debug('LAST MESSAGE: '.$telegramRequest->getLastMessage());
 
         if (!$this->calendar->isSelectedDate($telegramRequest->getLastMessage())) {
             $event->setBlocked(true);

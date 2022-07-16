@@ -10,6 +10,7 @@ use App\UseCase\Search\Params;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class Search implements SearchSourceInterface
 {
@@ -52,7 +53,10 @@ class Search implements SearchSourceInterface
 
         $searchResults = collect([]);
         foreach ($content['hotels'] as $row) {
-            $searchResults->push(ResultFactory::makeResult($row, $this->params));
+            $oneResult = ResultFactory::makeResult($row, $this->params);
+            if (!empty($oneResult)) {
+                $searchResults->push($oneResult);
+            }
         }
 
         return $searchResults;
