@@ -31,6 +31,14 @@ class Result
     // Долгота отеля
     private float $longitude;
 
+    // Дата заезда
+    private \DateTime $checkInDate;
+
+    // Дата выезда
+    private \DateTime $checkOutDate;
+
+    private string $address;
+
     public function getLatitude(): float
     {
         return $this->latitude;
@@ -125,5 +133,38 @@ class Result
     public function setRef(string $ref): void
     {
         $this->ref = $ref;
+    }
+
+    public function getCheckInDate(): \DateTime
+    {
+        return $this->checkInDate;
+    }
+
+    /**
+     * @param \DateTime $checkInDate
+     */
+    public function setCheckInDate(\DateTime $checkInDate): void
+    {
+        $this->checkInDate = $checkInDate;
+    }
+
+    public function getCheckOutDate(): \DateTime
+    {
+        return $this->checkOutDate;
+    }
+
+    public function setCheckOutDate(\DateTime $checkOutDate): void
+    {
+        $this->checkOutDate = $checkOutDate;
+    }
+
+    public function setAddress(string $address): void
+    {
+        $this->address = $address;
+    }
+
+    public function getAddress(): string
+    {
+        return $this->address;
     }
 }

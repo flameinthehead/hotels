@@ -38,6 +38,9 @@ class ResultFactory implements SearchResultFactory
         $result->setRef('yandex');
         $result->setLongitude($searchResult['hotel']['coordinates']['lon']);
         $result->setLatitude($searchResult['hotel']['coordinates']['lat']);
+        $result->setCheckInDate(new \DateTime($params->getCheckinDate()));
+        $result->setCheckOutDate(new \DateTime($params->getCheckoutDate()));
+        $result->setAddress($searchResult['hotel']['address']);
 
         return $result;
     }

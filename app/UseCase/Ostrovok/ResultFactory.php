@@ -5,6 +5,7 @@ namespace App\UseCase\Ostrovok;
 use App\UseCase\Search\Result;
 use App\UseCase\Search\SearchParamsFactoryInterface;
 use App\UseCase\Search\SearchResultFactory;
+use Illuminate\Support\Facades\Log;
 
 class ResultFactory implements SearchResultFactory
 {
@@ -18,6 +19,9 @@ class ResultFactory implements SearchResultFactory
         $price = $searchResult['rates'][0]['payment_options']['payment_types'][0]['amount'] ?? null;
 
 
+        $checkInDate = new \DateTime($params->getArrivalDate());
+        $checkOutDate = new \DateTime($params->getDepartureDate());
+
         /** @var \App\UseCase\Ostrovok\Params $params */
         $regionCatalogSlug = $searchResult['static_vm']['region_catalog_slug'];
         $bookLink = sprintf(
@@ -25,8 +29,8 @@ class ResultFactory implements SearchResultFactory
             $regionCatalogSlug,
             $searchResult['master_id'],
             $searchResult['ota_hotel_id'],
-            (new \DateTime($params->getArrivalDate()))->format('d.m.Y'),
-            (new \DateTime($params->getDepartureDate()))->format('d.m.Y'),
+            $checkInDate->format('d.m.Y'),
+            $checkOutDate->format('d.m.Y'),
             $params->getAdults(),
         );
 
@@ -59,6 +63,9 @@ class ResultFactory implements SearchResultFactory
         $result->setRef('ostrovok');
         $result->setLatitude($searchResult['static_vm']['latitude']);
         $result->setLongitude($searchResult['static_vm']['longitude']);
+        $result->setCheckInDate($checkInDate);
+        $result->setCheckOutDate($checkOutDate);
+        $result->setAddress($searchResult['static_vm']['address']);
 
         return $result;
     }

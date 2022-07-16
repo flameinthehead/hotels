@@ -9,4 +9,6 @@ class Smiles
     public const TV = "\xF0\x9F\x93\xBA";
     public const ROUND_PUSHPIN = "\xF0\x9F\x93\x8D";
     public const DOUBLE_RIGHT_ARROW = "\xE2\x8F\xA9";
+    public const CALENDAR = "\xF0\x9F\x93\x86";
+    public const RULER = "\xF0\x9F\x93\x8F";
 }
