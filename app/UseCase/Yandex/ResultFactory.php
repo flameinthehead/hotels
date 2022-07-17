@@ -9,7 +9,7 @@ use App\UseCase\Search\SearchResultFactory;
 class ResultFactory implements SearchResultFactory
 {
     public const BASE_RESULT_URL = 'https://travel.yandex.ru/hotels/';
-    public const OPTIMAL_PREVIEW_SIZE = 'M';
+    public const OPTIMAL_PREVIEW_SIZE = 'L';
 
     public static function makeResult(array $searchResult, SearchParamsFactoryInterface $params): ?Result
     {

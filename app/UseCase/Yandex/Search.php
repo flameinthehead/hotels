@@ -30,24 +30,25 @@ class Search implements SearchSourceInterface
         }
 
         $options = $this->prepareOptions($proxy);
+        $response = $this->getResponse($options);
 
-        $response = $this->client->request('GET', self::SEARCH_BASE_URL, $options);
+        $hotels = [];
 
-        if ($response->getStatusCode() != 200) {
-            throw new YandexSearchException('Yandex search response code != 200');
-        }
+        for($i = 0; $i < 10; ++$i) {
+            $hotels = array_merge($hotels, $response['data']['hotels']);
+            Log::debug(var_export($response['data']['offerSearchProgress'], true));
+            if ($response['data']['offerSearchProgress']['finished'] === true) {
+                break;
+            }
+            sleep(1);
+            $options['query']['pollIteration'] += 1;
+            $options['query']['context'] = $response['data']['context'];
 
-        $response = json_decode($response->getBody()->getContents(), true);
-        if (empty($response) || !is_array($response)) {
-            throw new YandexSearchException('Yandex search invalid response');
-        }
-
-        if (!isset($response['data']['hotels']) || !is_array($response['data']['hotels'])) {
-            throw new YandexSearchException('Yandex search no hotels found');
+            $response = $this->getResponse($options);
         }
 
         $searchResults = collect([]);
-        foreach ($response['data']['hotels'] as $row) {
+        foreach ($hotels as $row) {
             $oneResult = ResultFactory::makeResult($row, $this->params);
             if (!empty($oneResult)) {
                 $searchResults->push($oneResult);
@@ -97,5 +98,26 @@ class Search implements SearchSourceInterface
         }
 
         return $options;
+    }
+
+    private function getResponse(array $options): array
+    {
+        $response = $this->client->request('GET', self::SEARCH_BASE_URL, $options);
+
+        if ($response->getStatusCode() != 200) {
+            throw new YandexSearchException('Yandex search response code != 200');
+        }
+
+        $response = json_decode($response->getBody()->getContents(), true);
+
+        if (empty($response) || !is_array($response)) {
+            throw new YandexSearchException('Yandex search invalid response');
+        }
+
+        if (!isset($response['data']['hotels']) || !is_array($response['data']['hotels'])) {
+            throw new YandexSearchException('Yandex search no hotels found');
+        }
+
+        return $response;
     }
 }
