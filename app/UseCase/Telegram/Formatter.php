@@ -48,7 +48,7 @@ class Formatter
     private function getFacilities(Result $oneResult): string
     {
         return $oneResult->getFacilities()
-            ? sprintf('%s Удобства: <b>%s</b>', Smiles::TV, implode(', ', $oneResult->getFacilities()))
+            ? sprintf('%s Удобства: <b>%s</b>', Smiles::TV, $oneResult->getFacilities())
             : '';
     }
 

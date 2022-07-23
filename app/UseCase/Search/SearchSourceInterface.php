@@ -2,14 +2,11 @@
 
 namespace App\UseCase\Search;
 
-
-use App\Models\Proxy;
-use Illuminate\Support\Collection;
-use Psr\Http\Message\ResponseInterface;
+use App\Models\SearchRequest;
 
 interface SearchSourceInterface
 {
-    public function search(array $proxyList): Collection;
+    public function search(array $proxyList, SearchRequest $searchRequest): void;
 
     public function setParams(Params $generalParams);
 

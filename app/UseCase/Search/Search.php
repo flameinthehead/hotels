@@ -2,15 +2,15 @@
 
 namespace App\UseCase\Search;
 
-use App\Http\Requests\SearchRequest;
 use App\Jobs\SearchOstrovok;
 use App\Jobs\SearchYandex;
 use App\Models\City;
 use App\Models\Proxy;
+use App\Models\SearchRequest;
+use App\Models\TelegramRequest;
 use GuzzleHttp\Client;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use Psr\Http\Message\ResponseInterface;
 
 class Search
 {
@@ -22,85 +22,15 @@ class Search
     {
     }
 
-    public function search(SearchRequest $request): array
+    public function searchByParams(Params $params, TelegramRequest $telegramRequest): void
     {
-        return $this->searchByParams($this->prepareParams($request));
-    }
+        $searchRequest = new SearchRequest();
+        $searchRequest->hash = $params->getHash($telegramRequest->telegram_from_id);
+        $searchRequest->telegram_request_id = $telegramRequest->id;
+        $searchRequest->save();
 
-    public function searchByParams(Params $params): array
-    {
-        SearchYandex::dispatch($params)->onQueue('search_yandex');
-        SearchOstrovok::dispatch($params)->onQueue('search_ostrovok');
-
-        return [];
-        /*$searchSources = config('search_sources');
-
-        $requestArr = [];
-        foreach ($searchSources as $source) {
-            $searchSource = SearchFactory::makeSearchBySourceName($source);
-            $searchSource->setParams($params);
-
-            $sourceProxyList = $this->proxy->getAllEnabledBySource($source);
-            foreach ($sourceProxyList as $proxyModel) {
-                $requestArr[$source . '_' . $proxyModel->address] = $this->client->getAsync(
-                    '',
-                    $searchSource->getOptions($proxyModel)
-                );
-            }
-        }
-
-        if (empty($requestArr)) {
-            throw new \Exception('Не удалось сформировать запрос для поиска');
-        }
-
-        $responses = \GuzzleHttp\Promise\settle($requestArr)->wait();
-
-//        $searchResults =
-
-        foreach ($responses as $key => $item) {
-            list($source, $proxyAddress) = explode('_', $key);
-            $searchSource = SearchFactory::makeSearchBySourceName($source);
-
-            if ($this->isValidResponse($item, $searchSource)) {
-
-            } else {
-
-            }
-        }
-        unset($responses);*/
-
-        /*$searchResults = collect([]);
-
-        $searchSources = config('search_sources');
-        if (empty($searchSources)) {
-            throw new \Exception('Не заданы источники поиска');
-        }
-
-        foreach ($searchSources as $source) {
-            $this->source = $source;
-            $sourceEngine = \App::get($source);
-            if (empty($sourceEngine) || (!$sourceEngine instanceof SearchSourceInterface)) {
-                throw new \Exception('Не удалось создать поисковой движок с кодом ' . $source);
-            }
-
-            if (!Schema::hasColumn('proxies', $source)) {
-                throw new \Exception('Не заданы прокси для источника ' . $source);
-            }
-
-            $this->proxy = $this->proxy->getRandBySource($source);
-
-            if (!($this->lastProxy = $this->proxy->getRandBySource($source))) {
-                throw new \Exception('Не найден прокси для источника ' . $source);
-            }
-
-            $sourceEngine->setParams($params);
-            $results = $sourceEngine->search($this->lastProxy);
-            if (!empty($results)) {
-                $searchResults = $searchResults->merge($results);
-            }
-        }
-
-        return $this->sorter->sort($searchResults);*/
+        SearchYandex::dispatch($params, $searchRequest->hash)->onQueue('search_yandex');
+        SearchOstrovok::dispatch($params, $searchRequest->hash)->onQueue('search_ostrovok');
     }
 
     public function getLastProxy(): ?Proxy
@@ -141,15 +71,5 @@ class Search
         $params->setAdults($request->get('adults'));
 
         return $params;
-    }
-
-    private function isValidResponse(array $response, SearchSourceInterface $searchSource): bool
-    {
-        return (
-            isset($response['value'])
-            && $response['value'] instanceof ResponseInterface
-            && $response['value']->getStatusCode() === 200
-            && $searchSource->isValidResponse($response['value'])
-        );
     }
 }

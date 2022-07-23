@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use ZeroDaHero\LaravelWorkflow\Traits\WorkflowTrait;
 
 class TelegramRequest extends Model
@@ -23,6 +24,11 @@ class TelegramRequest extends Model
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
+    }
+
+    public function searchRequest(): HasOne
+    {
+        return $this->hasOne(SearchRequest::class);
     }
 
     public function findNotFinishedByUserId(int $telegramUserId): ?self

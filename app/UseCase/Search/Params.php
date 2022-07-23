@@ -66,4 +66,15 @@ class Params
     {
         $this->adults = $adults;
     }
+
+    public function getHash(int $chatId): string
+    {
+        return md5(
+            $this->getCity()->id
+            . $this->getCheckInDate()->format('d.m.Y')
+            . $this->getCheckOutDate()->format('d.m.Y')
+            . $this->getAdults()
+            . $chatId
+        );
+    }
 }

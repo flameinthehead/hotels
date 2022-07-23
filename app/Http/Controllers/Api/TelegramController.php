@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TelegramRequest;
+use App\Models\TelegramRequest as TelegramRequestModel;
 use App\Jobs\SearchYandex;
 use App\Models\Result;
 use App\UseCase\Search\Params;
@@ -26,7 +27,7 @@ class TelegramController extends Controller
     {
     }
 
-    public function messageHandler(TelegramRequest $request)
+    public function messageHandler(TelegramRequest $request, TelegramRequestModel $entity)
     {
         $callBackQueryPrefix = '';
         $callBackData = '';
@@ -43,11 +44,8 @@ class TelegramController extends Controller
             $requestParams = $this->telegramService->processRequest($fromId, $message, $callBackData, $callBackMessageId);
             if (!empty($requestParams) && $requestParams instanceof Params) {
                 $this->sender->sendMessage($fromId, 'Пожалуйста, подождите, выполняется поиск...');
-                $results = $this->searchService->searchByParams($requestParams);
-                $this->sender->sendMessage($fromId, 'Поиск завершён'.(empty($results) ? ' - ничего не найдено' : '').'.');
-                if (!empty($results)) {
-                    $this->telegramService->sendResults($fromId, $results);
-                }
+                $telegramRequestModel = $entity->findNotFinishedByUserId($fromId);
+                $this->searchService->searchByParams($requestParams, $telegramRequestModel);
             }
         } catch (\Throwable $e) {
             $this->sender->sendMessage($fromId, 'Произошла ошибка при поиске.');

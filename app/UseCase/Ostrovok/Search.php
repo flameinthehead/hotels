@@ -4,8 +4,7 @@ namespace App\UseCase\Ostrovok;
 
 use App\Exceptions\OstrovokSearchException;
 use App\Models\OstrovokCity;
-use App\Models\Proxy;
-use App\Models\YandexCity;
+use App\Models\SearchRequest;
 use App\UseCase\Search\Params;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
@@ -26,7 +25,7 @@ class Search implements SearchSourceInterface
     {
     }
 
-    public function search(Proxy $proxy): Collection
+    public function search(array $proxyList, SearchRequest $searchRequest): Collection
     {
         if (empty($this->params)) {
             throw new \Exception('Не заданы параметры поиска');

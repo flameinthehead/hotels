@@ -3,10 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Result extends Model
 {
     protected $table = 'search_results';
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'check_in_date',
+        'check_out_date',
+    ];
+
+    public function searchRequest(): BelongsTo
+    {
+        $this->belongsTo(SearchRequest::class);
+    }
 
     public function getLatitude(): float
     {
@@ -86,7 +99,7 @@ class Result extends Model
 
     public function getHotelPreview(): string|null
     {
-        return $this->hotel_preview;
+        return $this->preview;
     }
 
     public function setHotelPreview(string|null $hotelPreview): void

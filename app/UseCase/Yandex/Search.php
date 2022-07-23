@@ -4,12 +4,11 @@ namespace App\UseCase\Yandex;
 
 use App\Exceptions\YandexSearchException;
 use App\Models\Proxy;
+use App\Models\SearchRequest;
 use App\Models\YandexCity;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\Serializer;
 
@@ -25,7 +24,7 @@ class Search implements SearchSourceInterface
     {
     }
 
-    public function search(array $proxyList): Collection
+    public function search(array $proxyList, SearchRequest $searchRequest): void
     {
         if (empty($this->params)) {
             throw new \Exception('Не заданы параметры поиска');
@@ -48,18 +47,13 @@ class Search implements SearchSourceInterface
             $response = $this->getResponse($options, $proxyList);
         }
 
-        $searchResults = collect([]);
         foreach ($hotels as $row) {
             $oneResult = ResultFactory::makeResult($row, $this->params);
             if (!empty($oneResult)) {
+                $oneResult->search_request_id = $searchRequest->id;
                 $oneResult->save();
-                $searchResults->push($oneResult);
             }
         }
-
-        Log::debug(json_encode($searchResults));
-
-        return $searchResults;
     }
 
     public function setParams(\App\UseCase\Search\Params $generalParams)
@@ -134,7 +128,7 @@ class Search implements SearchSourceInterface
                 continue;
             }
             $content = json_decode($responseItem['value']->getBody()->getContents(), true);
-            if ($this->isValidResponse($content)) {
+            if (!empty($content) && is_array($content) && $this->isValidResponse($content)) {
                 return $content;
             }
         }
