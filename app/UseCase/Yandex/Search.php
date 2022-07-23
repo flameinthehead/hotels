@@ -7,8 +7,10 @@ use App\Models\Proxy;
 use App\Models\YandexCity;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\Serializer;
 
 class Search implements SearchSourceInterface
@@ -23,20 +25,19 @@ class Search implements SearchSourceInterface
     {
     }
 
-    public function search(Proxy $proxy): Collection
+    public function search(array $proxyList): Collection
     {
         if (empty($this->params)) {
             throw new \Exception('Не заданы параметры поиска');
         }
 
-        $options = $this->prepareOptions($proxy);
-        $response = $this->getResponse($options);
+        $options = $this->getOptions();
+        $response = $this->getResponse($options, $proxyList);
 
         $hotels = [];
 
-        for($i = 0; $i < 10; ++$i) {
+        for($i = 0; $i < 3; ++$i) {
             $hotels = array_merge($hotels, $response['data']['hotels']);
-            Log::debug(var_export($response['data']['offerSearchProgress'], true));
             if ($response['data']['offerSearchProgress']['finished'] === true) {
                 break;
             }
@@ -44,16 +45,19 @@ class Search implements SearchSourceInterface
             $options['query']['pollIteration'] += 1;
             $options['query']['context'] = $response['data']['context'];
 
-            $response = $this->getResponse($options);
+            $response = $this->getResponse($options, $proxyList);
         }
 
         $searchResults = collect([]);
         foreach ($hotels as $row) {
             $oneResult = ResultFactory::makeResult($row, $this->params);
             if (!empty($oneResult)) {
+                $oneResult->save();
                 $searchResults->push($oneResult);
             }
         }
+
+        Log::debug(json_encode($searchResults));
 
         return $searchResults;
     }
@@ -71,11 +75,16 @@ class Search implements SearchSourceInterface
         $this->params = Params::makeSourceParams($generalParams);
     }
 
-    private function prepareOptions(Proxy $proxy = null): array
+    public function getUrl(): string
     {
-        $options = [
-            'query' => $this->serializer->normalize($this->params, 'array'),
-            'headers' => [
+        return self::SEARCH_BASE_URL;
+    }
+
+    public function getOptions(): array
+    {
+        return [
+            RequestOptions::QUERY => $this->serializer->normalize($this->params, 'array'),
+            RequestOptions::HEADERS => [
                 "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 "Accept-Encoding" => "gzip, deflate, br",
                 "Accept-Language" => "ru-RU,ru;q=0.9",
@@ -91,33 +100,45 @@ class Search implements SearchSourceInterface
                 "Upgrade-Insecure-Requests" => "1",
                 "User-Agent" => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
             ],
-            'connect_timeout' => self::CONNECTION_TIMEOUT,
+            RequestOptions::CONNECT_TIMEOUT => self::CONNECTION_TIMEOUT,
         ];
-        if(!empty($proxy) && !empty($proxy->address)){
-            $options['proxy'] = $proxy->address;
-        }
-
-        return $options;
     }
 
-    private function getResponse(array $options): array
+    public function isValidResponse(array $content): bool
     {
-        $response = $this->client->request('GET', self::SEARCH_BASE_URL, $options);
+        return (!empty($content) && is_array($content) && isset($content['data']['hotels']));
+    }
 
-        if ($response->getStatusCode() != 200) {
-            throw new YandexSearchException('Yandex search response code != 200');
+    /**
+     * @param array $options
+     * @param Proxy[] $proxyList
+     * @return array
+     * @throws YandexSearchException
+     */
+    private function getResponse(array $options, array $proxyList): array
+    {
+        $requestArr = [];
+        foreach ($proxyList as $proxyModel) {
+            $options[RequestOptions::PROXY] = $proxyModel->address;
+
+            $requestArr[$proxyModel->address] = $this->client->getAsync(
+                self::SEARCH_BASE_URL,
+                $options
+            );
         }
 
-        $response = json_decode($response->getBody()->getContents(), true);
+        $responses = \GuzzleHttp\Promise\settle($requestArr)->wait();
 
-        if (empty($response) || !is_array($response)) {
-            throw new YandexSearchException('Yandex search invalid response');
+        foreach ($responses as $responseItem) {
+            if (!isset($responseItem['value']) || !($responseItem['value'] instanceof ResponseInterface)) {
+                continue;
+            }
+            $content = json_decode($responseItem['value']->getBody()->getContents(), true);
+            if ($this->isValidResponse($content)) {
+                return $content;
+            }
         }
 
-        if (!isset($response['data']['hotels']) || !is_array($response['data']['hotels'])) {
-            throw new YandexSearchException('Yandex search no hotels found');
-        }
-
-        return $response;
+        throw new YandexSearchException('Yandex search invalid response');
     }
 }

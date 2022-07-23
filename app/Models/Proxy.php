@@ -29,6 +29,8 @@ class Proxy extends Model
             $query->where('source', $proxySource);
         }
 
+//        $query->where('address', '209.166.175.201:8080'); // @TODO убрать
+
         $query->orderBy('updated_at', 'DESC');
 
         return $query->get()->all();
@@ -38,5 +40,10 @@ class Proxy extends Model
     {
         $query = self::query()->where($source, '1')->inRandomOrder();
         return $query->firstOrFail();
+    }
+
+    public function getAllEnabledBySource(string $source, int $limit = 10): array
+    {
+        return self::query()->where($source, '1')->inRandomOrder()->limit($limit)->get()->all();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\UseCase\Yandex;
 
-use App\UseCase\Search\Result;
+use App\Models\Result;
 use App\UseCase\Search\SearchParamsFactoryInterface;
 use App\UseCase\Search\SearchResultFactory;
 

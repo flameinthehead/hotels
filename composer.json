@@ -14,6 +14,7 @@
         "ramsey/uuid": "^4.3",
         "symfony/property-access": "^6.0",
         "symfony/serializer": "^6.0",
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^12.0",
         "zerodahero/laravel-workflow": "^4.0"
     },
     "require-dev": {

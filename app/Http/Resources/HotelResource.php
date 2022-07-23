@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\UseCase\Search\Result;
+use App\Models\Result;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class HotelResource extends JsonResource

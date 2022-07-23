@@ -9,8 +9,10 @@ use App\Models\YandexCity;
 use App\UseCase\Search\Params;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Psr\Http\Message\ResponseInterface;
 
 class Search implements SearchSourceInterface
 {
@@ -32,11 +34,7 @@ class Search implements SearchSourceInterface
 
         $response = $this->client->post(
             self::SEARCH_BASE_URL,
-            [
-                'json' => json_decode(json_encode($this->prepareOptions())),
-                'proxy' => $proxy->address,
-                'connect_timeout' => self::CONNECTION_TIMEOUT,
-            ]
+            $this->getOptions()
         );
 
         if ($response->getStatusCode() != 200) {
@@ -74,9 +72,14 @@ class Search implements SearchSourceInterface
         $this->params = \App\UseCase\Ostrovok\Params::makeSourceParams($generalParams);
     }
 
-    private function prepareOptions(): array
+    public function getUrl(): string
     {
-        return [
+        return self::SEARCH_BASE_URL;
+    }
+
+    public function getOptions(): array
+    {
+        $json = [
             'session_params' => [
                 'currency' => 'RUB',
                 'language' => 'ru',
@@ -96,5 +99,15 @@ class Search implements SearchSourceInterface
             'map_hotels' => true,
             'sort' => 'price_asc'
         ];
+
+        return [
+            'json' => json_decode(json_encode($json)),
+            'connect_timeout' => self::CONNECTION_TIMEOUT,
+        ];
+    }
+
+    public function isValidResponse(array $content): bool
+    {
+        return (!empty($content) && is_array($content) && isset($content['hotels']));
     }
 }

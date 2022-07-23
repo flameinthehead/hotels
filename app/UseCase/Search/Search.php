@@ -3,16 +3,22 @@
 namespace App\UseCase\Search;
 
 use App\Http\Requests\SearchRequest;
+use App\Jobs\SearchOstrovok;
+use App\Jobs\SearchYandex;
 use App\Models\City;
 use App\Models\Proxy;
+use GuzzleHttp\Client;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
+use Psr\Http\Message\ResponseInterface;
 
 class Search
 {
-    private ?string $source;
+    private ?string $source = null;
 
-    public function __construct(private Proxy $proxy, private Proxy $lastProxy, private Sorter $sorter)
+    private ?Proxy $lastProxy = null;
+
+    public function __construct(private Proxy $proxy, private Sorter $sorter, private Client $client)
     {
     }
 
@@ -23,7 +29,47 @@ class Search
 
     public function searchByParams(Params $params): array
     {
-        $searchResults = collect([]);
+        SearchYandex::dispatch($params)->onQueue('search_yandex');
+        SearchOstrovok::dispatch($params)->onQueue('search_ostrovok');
+
+        return [];
+        /*$searchSources = config('search_sources');
+
+        $requestArr = [];
+        foreach ($searchSources as $source) {
+            $searchSource = SearchFactory::makeSearchBySourceName($source);
+            $searchSource->setParams($params);
+
+            $sourceProxyList = $this->proxy->getAllEnabledBySource($source);
+            foreach ($sourceProxyList as $proxyModel) {
+                $requestArr[$source . '_' . $proxyModel->address] = $this->client->getAsync(
+                    '',
+                    $searchSource->getOptions($proxyModel)
+                );
+            }
+        }
+
+        if (empty($requestArr)) {
+            throw new \Exception('Не удалось сформировать запрос для поиска');
+        }
+
+        $responses = \GuzzleHttp\Promise\settle($requestArr)->wait();
+
+//        $searchResults =
+
+        foreach ($responses as $key => $item) {
+            list($source, $proxyAddress) = explode('_', $key);
+            $searchSource = SearchFactory::makeSearchBySourceName($source);
+
+            if ($this->isValidResponse($item, $searchSource)) {
+
+            } else {
+
+            }
+        }
+        unset($responses);*/
+
+        /*$searchResults = collect([]);
 
         $searchSources = config('search_sources');
         if (empty($searchSources)) {
@@ -32,7 +78,6 @@ class Search
 
         foreach ($searchSources as $source) {
             $this->source = $source;
-            /* @var SearchSourceInterface $sourceEngine */
             $sourceEngine = \App::get($source);
             if (empty($sourceEngine) || (!$sourceEngine instanceof SearchSourceInterface)) {
                 throw new \Exception('Не удалось создать поисковой движок с кодом ' . $source);
@@ -41,24 +86,24 @@ class Search
             if (!Schema::hasColumn('proxies', $source)) {
                 throw new \Exception('Не заданы прокси для источника ' . $source);
             }
-            /* @var Proxy */
-            $this->lastProxy = $this->proxy->getRandBySource($source);
 
-            if (! $this->lastProxy) {
+            $this->proxy = $this->proxy->getRandBySource($source);
+
+            if (!($this->lastProxy = $this->proxy->getRandBySource($source))) {
                 throw new \Exception('Не найден прокси для источника ' . $source);
             }
 
             $sourceEngine->setParams($params);
-            $results = $sourceEngine->search($this->proxy);
+            $results = $sourceEngine->search($this->lastProxy);
             if (!empty($results)) {
                 $searchResults = $searchResults->merge($results);
             }
         }
 
-        return $this->sorter->sort($searchResults);
+        return $this->sorter->sort($searchResults);*/
     }
 
-    public function getLastProxy(): Proxy
+    public function getLastProxy(): ?Proxy
     {
         return $this->lastProxy;
     }
@@ -72,7 +117,9 @@ class Search
     {
         $proxy = $this->getLastProxy();
         $source = $this->getLastSource();
+
         if (!empty($proxy) && !empty($source)) {
+            Log::debug('Горемычный прокси: ' . $proxy->address);
             $proxy->{$source} = '0';
             $proxy->save();
         }
@@ -94,5 +141,15 @@ class Search
         $params->setAdults($request->get('adults'));
 
         return $params;
+    }
+
+    private function isValidResponse(array $response, SearchSourceInterface $searchSource): bool
+    {
+        return (
+            isset($response['value'])
+            && $response['value'] instanceof ResponseInterface
+            && $response['value']->getStatusCode() === 200
+            && $searchSource->isValidResponse($response['value'])
+        );
     }
 }

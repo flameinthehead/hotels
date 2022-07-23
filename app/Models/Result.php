@@ -1,43 +1,12 @@
 <?php
 
-namespace App\UseCase\Search;
+namespace App\Models;
 
-class Result
+use Illuminate\Database\Eloquent\Model;
+
+class Result extends Model
 {
-    // Название отеля
-    private string $name;
-
-    // Стоимость за всё время пребывания
-    private int $price;
-
-    // Ссылка на страницу бронирования
-    private string $bookLink;
-
-    // Удобства
-    private array|null $facilities = null;
-
-    // Расстояние до центра
-    private float|null $distanceToCenter = null;
-
-    // Превью отеля
-    private string|null $hotelPreview = null;
-
-    // Источник поиска
-    private string $ref;
-
-    // Широта отеля
-    private float $latitude;
-
-    // Долгота отеля
-    private float $longitude;
-
-    // Дата заезда
-    private \DateTime $checkInDate;
-
-    // Дата выезда
-    private \DateTime $checkOutDate;
-
-    private string $address;
+    protected $table = 'search_results';
 
     public function getLatitude(): float
     {
@@ -46,7 +15,7 @@ class Result
 
     public function setLatitude(float $latitude): void
     {
-        $this->latitude = $latitude;
+        $this->attributes['latitude'] = $latitude;
     }
 
     public function getLongitude(): float
@@ -56,7 +25,7 @@ class Result
 
     public function setLongitude(float $longitude): void
     {
-        $this->longitude = $longitude;
+        $this->attributes['longitude'] = $longitude;
     }
 
     /**
@@ -72,7 +41,7 @@ class Result
      */
     public function setName(string $name): void
     {
-        $this->name = $name;
+        $this->attributes['name'] = $name;
     }
 
     public function getPrice(): int
@@ -82,47 +51,47 @@ class Result
 
     public function setPrice(int $price): void
     {
-        $this->price = $price;
+        $this->attributes['price'] = $price;
     }
 
     public function getBookLink(): string
     {
-        return $this->bookLink;
+        return $this->book_link;
     }
 
     public function setBookLink(string $bookLink): void
     {
-        $this->bookLink = $bookLink;
+        $this->attributes['book_link'] = $bookLink;
     }
 
-    public function getFacilities(): array|null
+    public function getFacilities(): string|null
     {
         return $this->facilities;
     }
 
     public function setFacilities(array $facilities): void
     {
-        $this->facilities = $facilities;
+        $this->attributes['facilities'] = implode(', ', $facilities);
     }
 
     public function getDistanceToCenter(): mixed
     {
-        return $this->distanceToCenter;
+        return $this->distance_to_center;
     }
 
     public function setDistanceToCenter(float $distanceToCenter): void
     {
-        $this->distanceToCenter = $distanceToCenter;
+        $this->attributes['distance_to_center'] = $distanceToCenter;
     }
 
     public function getHotelPreview(): string|null
     {
-        return $this->hotelPreview;
+        return $this->hotel_preview;
     }
 
     public function setHotelPreview(string|null $hotelPreview): void
     {
-        $this->hotelPreview = $hotelPreview;
+        $this->attributes['preview'] = $hotelPreview;
     }
 
     public function getRef(): string
@@ -132,12 +101,12 @@ class Result
 
     public function setRef(string $ref): void
     {
-        $this->ref = $ref;
+        $this->attributes['ref'] = $ref;
     }
 
     public function getCheckInDate(): \DateTime
     {
-        return $this->checkInDate;
+        return $this->check_in_date;
     }
 
     /**
@@ -145,22 +114,22 @@ class Result
      */
     public function setCheckInDate(\DateTime $checkInDate): void
     {
-        $this->checkInDate = $checkInDate;
+        $this->attributes['check_in_date'] = $checkInDate;
     }
 
     public function getCheckOutDate(): \DateTime
     {
-        return $this->checkOutDate;
+        return $this->check_out_date;
     }
 
     public function setCheckOutDate(\DateTime $checkOutDate): void
     {
-        $this->checkOutDate = $checkOutDate;
+        $this->attributes['check_out_date'] = $checkOutDate;
     }
 
     public function setAddress(string $address): void
     {
-        $this->address = $address;
+        $this->attributes['address'] = $address;
     }
 
     public function getAddress(): string

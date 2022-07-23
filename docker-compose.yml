@@ -1,6 +1,7 @@
 version: '2.4'
 services:
     nginx:
+        container_name: hotels_nginx
         build:
             context: ./
             dockerfile: docker/nginx.docker
@@ -11,6 +12,7 @@ services:
         links:
             -   php-fpm
     php-fpm:
+        container_name: hotels_php_fpm
         build:
             context: ./
             dockerfile: docker/php-fpm.docker
@@ -18,7 +20,7 @@ services:
             -   ./:/var/www
         links:
             - mysql
-            - redis
+#            - redis
         environment:
             - "DB_PORT=3306"
             - "DB_HOST=mysql"
@@ -37,7 +39,7 @@ services:
             - "~/.ssh/:/home/www-data/.ssh/"
         links:
             - mysql
-            - redis
+#            - redis
         environment:
             - "DB_PORT=3306"
             - "DB_HOST=mysql"
@@ -45,6 +47,7 @@ services:
             - "REDIS_HOST=redis"
         tty: true
     mysql:
+        container_name: hotels_mysql
         command: --authentication-policy=mysql_native_password
         build:
             context: ./
@@ -58,7 +61,20 @@ services:
             - "MYSQL_DATABASE=app"
         ports:
             -   "33063:3306"
-    redis:
-        image: redis:6.2
+#    redis:
+#        image: redis:6.2
+#        ports:
+#            -   "6380:6379"
+    rabbitmq:
+        container_name: hotels_rabbitmq
+        image: rabbitmq:management-alpine
+        init: true
         ports:
-            -   "6380:6379"
+            - 15673:15672
+            - 5673:5672
+        environment:
+            RABBITMQ_DEFAULT_VHOST: /
+            RABBITMQ_DEFAULT_USER: admin
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-password}
+        hostname: rabbitmq
+

@@ -24,8 +24,6 @@ class Suggestions
             throw new \Exception('Не удалось получить ответ в Suggestions');
         }
 
-
-
         $content = $result->getBody()->getContents();
 
         $decoded = json_decode($content, true);

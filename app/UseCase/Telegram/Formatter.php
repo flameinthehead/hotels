@@ -2,10 +2,12 @@
 
 namespace App\UseCase\Telegram;
 
-use App\UseCase\Search\Result;
+use App\Models\Result;
 
 class Formatter
 {
+    public const NO_PHOTO = 'no_photo_';
+
     /** @var Result[] $searchResults */
     public function formatSearchResults(array $searchResults): array
     {
@@ -25,7 +27,9 @@ class Formatter
                 $this->getBookLink($oneResult),
             ];
 
-            $messages[$oneResult->getHotelPreview()] = implode("\r\n\r\n", $messageData);
+            $photo = ($oneResult->getHotelPreview() ?? 'no_photo_' . $oneResult->getName());
+
+            $messages[$photo] = implode("\r\n\r\n", $messageData);
         }
 
         return $messages;

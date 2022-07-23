@@ -66,7 +66,12 @@ class Service
 
         $count = 0;
         foreach ($messages as $photoUrl => $message) {
-            $this->sender->sendPhoto($chatId, $photoUrl, $message);
+            if (mb_strpos($photoUrl, Formatter::NO_PHOTO) !== false) {
+                $this->sender->sendMessage($chatId, $message);
+            } else {
+                $this->sender->sendPhoto($chatId, $photoUrl, $message);
+            }
+
             ++$count;
             if ($count == 10) { // @TODO пагинация
                 break;

@@ -4,7 +4,7 @@ namespace App\UseCase\Ostrovok;
 
 use App\UseCase\Search\SearchParamsFactoryInterface;
 
-class   Params implements SearchParamsFactoryInterface
+class Params implements SearchParamsFactoryInterface
 {
     private string $departureDate;
 
