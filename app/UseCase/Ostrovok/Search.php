@@ -25,38 +25,49 @@ class Search implements SearchSourceInterface
     {
     }
 
-    public function search(array $proxyList, SearchRequest $searchRequest): Collection
+    public function search(array $proxyList, SearchRequest $searchRequest): void
     {
         if (empty($this->params)) {
             throw new \Exception('Не заданы параметры поиска');
         }
 
-        $response = $this->client->post(
-            self::SEARCH_BASE_URL,
-            $this->getOptions()
-        );
+        $requestArr = [];
 
-        if ($response->getStatusCode() != 200) {
-            throw new OstrovokSearchException('Ostrovok search response code != 200');
+        $options = $this->getOptions();
+        foreach ($proxyList as $proxyModel) {
+            $options[RequestOptions::PROXY] = $proxyModel->address;
+
+            $requestArr[$proxyModel->address] = $this->client->getAsync(
+                self::SEARCH_BASE_URL,
+                $options
+            );
         }
 
-
-        $content = json_decode($response->getBody()->getContents(), true);
-
-        if (empty($content) || !is_array($content) || !isset($content['hotels'])) {
-            throw new OstrovokSearchException('Некорретный ответ от Ostrovok');
-        }
+        $responses = \GuzzleHttp\Promise\settle($requestArr)->wait();
 
 
-        $searchResults = collect([]);
-        foreach ($content['hotels'] as $row) {
-            $oneResult = ResultFactory::makeResult($row, $this->params);
-            if (!empty($oneResult)) {
-                $searchResults->push($oneResult);
+        $content = null;
+        foreach ($responses as $responseItem) {
+            if (!isset($responseItem['value']) || !($responseItem['value'] instanceof ResponseInterface)) {
+                continue;
+            }
+            $content = json_decode($responseItem['value']->getBody()->getContents(), true);
+            if (!empty($content) && is_array($content) && $this->isValidResponse($content)) {
+                break;
             }
         }
 
-        return $searchResults;
+        if (empty($content)) {
+            throw new OstrovokSearchException('Ostrovok search invalid response');
+        }
+
+        foreach ($content['hotels'] as $row) {
+            $oneResult = ResultFactory::makeResult($row, $this->params);
+            if (!empty($oneResult)) {
+                $oneResult->search_request_id = $searchRequest->id;
+                $oneResult->save();
+            }
+        }
     }
 
     public function setParams(Params $generalParams)

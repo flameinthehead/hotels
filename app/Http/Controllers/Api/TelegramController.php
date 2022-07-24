@@ -23,8 +23,6 @@ class TelegramController extends Controller
 
     public function messageHandler(TelegramRequest $request, TelegramRequestModel $entity): void
     {
-//        Log::debug($request);
-
         $callBackQueryPrefix = '';
         $callBackData = '';
         $callBackMessageId = null;

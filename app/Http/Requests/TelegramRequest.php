@@ -17,7 +17,7 @@ class TelegramRequest extends FormRequest
 
     public function rules(Request $request): array
     {
-        $callBackQueryPrefix = '';
+        /*$callBackQueryPrefix = '';
         if ($request->has('callback_query')) {
             $callBackQueryPrefix = 'callback_query.';
         }
@@ -25,7 +25,8 @@ class TelegramRequest extends FormRequest
             $callBackQueryPrefix . 'message.message_id' => 'required|integer',
             $callBackQueryPrefix. 'message.chat.id' => 'required|integer',
             $callBackQueryPrefix . 'message.text' => 'required|string',
-        ];
+        ];*/
+        return [];
     }
 
     /**
@@ -40,7 +41,7 @@ class TelegramRequest extends FormRequest
             'success' => false,
             'errors' => $errors->messages(),
         ], 403);
-        Log::debug($errors->messages());
+        Log::error($errors->messages());
 
         throw new HttpResponseException($response);
     }

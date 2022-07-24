@@ -62,7 +62,7 @@ class Sender
     {
         $url = sprintf(self::BASE_URL.'%s/%s', env('TELEGRAM_BOT_TOKEN'), $method);
 
-        Log::debug('Send request '.json_encode($params, JSON_UNESCAPED_UNICODE));
+//        Log::debug('Send request '.json_encode($params, JSON_UNESCAPED_UNICODE));
 
         $params[self::DISABLE_WEB_PAGE_PREVIEW] = self::IS_DISABLED_LINK_PREVIEW;
         $params[self::PARSE_MODE_FIELD] = self::PARSE_MODE_VALUE;

@@ -29,8 +29,6 @@ class Proxy extends Model
             $query->where('source', $proxySource);
         }
 
-//        $query->where('address', '209.166.175.201:8080'); // @TODO убрать
-
         $query->orderBy('updated_at', 'DESC');
 
         return $query->get()->all();

@@ -2,35 +2,40 @@
 
 namespace App\Jobs;
 
+use App\Models\Proxy;
+use App\Models\SearchRequest;
+use App\UseCase\Search\FinishChecker;
 use App\UseCase\Search\Params;
+use App\UseCase\Ostrovok\Search;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class SearchOstrovok implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __construct(private Params $params, private string $hash)
     {
-        //
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
-    public function handle(Params $params)
+    public function handle(Search $searchService, Proxy $proxy, FinishChecker $finishChecker): void
     {
-        dump($params);
+        try {
+            $searchRequest = SearchRequest::where('hash', $this->hash)->firstOrFail();
+            $searchService->setParams($this->params);
+            $searchService->search($proxy->getAllEnabledBySource('ostrovok'), $searchRequest);
+        } catch (\Throwable $e) {
+            Log::error($e->getMessage(), $e->getTrace());
+        } finally {
+            $searchRequest->ostrovok = '1';
+            $searchRequest->save();
+
+            $finishChecker->sendFinishMessage($searchRequest);
+        }
     }
 }

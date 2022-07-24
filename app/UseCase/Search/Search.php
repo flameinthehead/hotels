@@ -33,7 +33,6 @@ class Search
 
         foreach ($sources as $source) {
             $jobClassName = 'App\Jobs\Search'.ucfirst($source);
-            Log::debug('job class name: ' . $jobClassName);
             if (!class_exists($jobClassName)) {
                throw new \Exception('Не найден job для источника ' . $source);
             }
@@ -57,7 +56,6 @@ class Search
         $source = $this->getLastSource();
 
         if (!empty($proxy) && !empty($source)) {
-            Log::debug('Горемычный прокси: ' . $proxy->address);
             $proxy->{$source} = '0';
             $proxy->save();
         }
