@@ -5,17 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TelegramRequest;
 use App\Models\TelegramRequest as TelegramRequestModel;
-use App\Jobs\SearchYandex;
 use App\Models\Result;
 use App\UseCase\Search\Params;
 use App\UseCase\Search\Search;
 use App\UseCase\Telegram\Sender;
 use App\UseCase\Telegram\Service;
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\CurlMultiHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Pool;
-use GuzzleHttp\Promise\Utils;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Log;
 
@@ -27,8 +21,10 @@ class TelegramController extends Controller
     {
     }
 
-    public function messageHandler(TelegramRequest $request, TelegramRequestModel $entity)
+    public function messageHandler(TelegramRequest $request, TelegramRequestModel $entity): void
     {
+//        Log::debug($request);
+
         $callBackQueryPrefix = '';
         $callBackData = '';
         $callBackMessageId = null;

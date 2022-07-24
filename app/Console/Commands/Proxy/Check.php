@@ -38,10 +38,16 @@ class Check extends Command
      */
     public function handle()
     {
-        $searchSource = $this->argument('searchSource');
-        $proxySource = $this->argument('proxySource');
+        try {
+            $searchSource = $this->argument('searchSource');
+            $proxySource = $this->argument('proxySource');
 
-        $this->checker->check($searchSource, $proxySource, $this->output);
-        return 0;
+            $this->checker->check($searchSource, $proxySource, $this->output);
+            $this->output->success('Прокси для источника ' . $searchSource . ' успешно обновлены');
+            return Command::SUCCESS;
+        } catch (\Throwable $e) {
+            $this->output->error($e->getMessage());
+            return Command::FAILURE;
+        }
     }
 }

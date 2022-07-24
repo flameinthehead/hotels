@@ -7,7 +7,6 @@ use App\UseCase\Search\Sorter;
 use App\UseCase\Telegram\Sender;
 use App\UseCase\Telegram\Service;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;

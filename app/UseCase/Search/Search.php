@@ -29,8 +29,16 @@ class Search
         $searchRequest->telegram_request_id = $telegramRequest->id;
         $searchRequest->save();
 
-        SearchYandex::dispatch($params, $searchRequest->hash)->onQueue('search_yandex');
-        SearchOstrovok::dispatch($params, $searchRequest->hash)->onQueue('search_ostrovok');
+        $sources = config('search_sources');
+
+        foreach ($sources as $source) {
+            $jobClassName = 'App\Jobs\Search'.ucfirst($source);
+            Log::debug('job class name: ' . $jobClassName);
+            if (!class_exists($jobClassName)) {
+               throw new \Exception('Не найден job для источника ' . $source);
+            }
+            $jobClassName::dispatch($params, $searchRequest->hash)->onQueue('search_' . $source);
+        }
     }
 
     public function getLastProxy(): ?Proxy

@@ -24,30 +24,26 @@ class Checker
 
     public function check(string $searchSourceCode, string $proxySource = null, \Illuminate\Console\OutputStyle $output): void
     {
-        try {
-            $proxyForChecker = $this->proxy->forChecker($searchSourceCode, $proxySource);
+        $proxyForChecker = $this->proxy->forChecker($searchSourceCode, $proxySource);
 
-            if (empty($proxyForChecker)) {
-                return;
-            }
-
-            $searchSource = SearchFactory::makeSearchBySourceName($searchSourceCode);
-
-            $proxyForCheckerChunked = array_chunk($proxyForChecker, self::PROXY_COUNT_PER_REQUEST);
-            $bar = $output->createProgressBar(count($proxyForCheckerChunked));
-
-            $this->checkChunk(
-                $proxyForCheckerChunked,
-                new Client(['base_uri' => $searchSource->getUrl()]),
-                $searchSource,
-                $searchSourceCode,
-                $bar
-            );
-
-            $bar->finish();
-        } catch (\Throwable $e) {
-            Log::error($e->getMessage(), $e->getTrace());
+        if (empty($proxyForChecker)) {
+            return;
         }
+
+        $searchSource = SearchFactory::makeSearchBySourceName($searchSourceCode);
+
+        $proxyForCheckerChunked = array_chunk($proxyForChecker, self::PROXY_COUNT_PER_REQUEST);
+        $bar = $output->createProgressBar(count($proxyForCheckerChunked));
+
+        $this->checkChunk(
+            $proxyForCheckerChunked,
+            new Client(['base_uri' => $searchSource->getUrl()]),
+            $searchSource,
+            $searchSourceCode,
+            $bar
+        );
+
+        $bar->finish();
     }
 
     private function checkChunk(
