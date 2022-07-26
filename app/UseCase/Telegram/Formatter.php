@@ -3,6 +3,7 @@
 namespace App\UseCase\Telegram;
 
 use App\Models\Result;
+use Illuminate\Support\Facades\Log;
 
 class Formatter
 {
@@ -27,7 +28,11 @@ class Formatter
                 $this->getBookLink($oneResult),
             ];
 
-            $photo = ($oneResult->getHotelPreview() ?? 'no_photo_' . $oneResult->getName());
+            $photo = (
+                !empty($oneResult->getHotelPreview())
+                    ? $oneResult->getHotelPreview()
+                    : self::NO_PHOTO . $oneResult->getName()
+            );
 
             $messages[$photo] = implode("\r\n\r\n", $messageData);
         }
