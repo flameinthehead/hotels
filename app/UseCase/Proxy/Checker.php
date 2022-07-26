@@ -16,7 +16,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 class Checker
 {
-    public const PROXY_COUNT_PER_REQUEST = 250;
+    public const PROXY_COUNT_PER_REQUEST = 500;
 
     public function __construct(private Proxy $proxy)
     {
