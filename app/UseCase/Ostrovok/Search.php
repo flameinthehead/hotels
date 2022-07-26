@@ -18,6 +18,7 @@ class Search implements SearchSourceInterface
     public const SEARCH_BASE_URL = 'https://ostrovok.ru/hotel/search/v2/site/serp';
 
     public const CONNECTION_TIMEOUT = 5;
+    public const TIMEOUT = 20;
 
     private \App\UseCase\Ostrovok\Params $params;
 
@@ -111,8 +112,9 @@ class Search implements SearchSourceInterface
         ];
 
         return [
-            'json' => json_decode(json_encode($json)),
-            'connect_timeout' => self::CONNECTION_TIMEOUT,
+            RequestOptions::JSON => json_decode(json_encode($json)),
+            RequestOptions::CONNECT_TIMEOUT => self::CONNECTION_TIMEOUT,
+            RequestOptions::TIMEOUT => self::TIMEOUT,
         ];
     }
 

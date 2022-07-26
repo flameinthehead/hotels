@@ -75,6 +75,7 @@ class Params
             . $this->getCheckOutDate()->format('d.m.Y')
             . $this->getAdults()
             . $chatId
+            . time()
         );
     }
 }

@@ -32,10 +32,16 @@ class SearchOstrovok implements ShouldQueue
         } catch (\Throwable $e) {
             Log::error($e->getMessage(), $e->getTrace());
         } finally {
-            $searchRequest->ostrovok = '1';
-            $searchRequest->save();
+            try {
+                // нужно заново поискать
+                $searchRequest = SearchRequest::where('hash', $this->hash)->firstOrFail();
+                $searchRequest->ostrovok = '1';
+                $searchRequest->save();
 
-            $finishChecker->sendFinishMessage($searchRequest);
+                $finishChecker->sendFinishMessage($searchRequest);
+            } catch (\Throwable $e) {
+                Log::error($e->getMessage(), $e->getTrace());
+            }
         }
     }
 }

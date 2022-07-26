@@ -17,6 +17,7 @@ class Search implements SearchSourceInterface
     public const SEARCH_BASE_URL = 'https://travel.yandex.ru/api/hotels/searchHotels';
 
     public const CONNECTION_TIMEOUT = 5;
+    public const TIMEOUT = 20;
 
     private Params $params;
 
@@ -95,6 +96,7 @@ class Search implements SearchSourceInterface
                 "User-Agent" => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
             ],
             RequestOptions::CONNECT_TIMEOUT => self::CONNECTION_TIMEOUT,
+            RequestOptions::TIMEOUT => self::TIMEOUT,
         ];
     }
 
