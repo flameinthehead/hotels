@@ -2,6 +2,8 @@
 
 namespace App\UseCase\Telegram;
 
+use Illuminate\Support\Facades\Log;
+
 class Calendar
 {
     private array $calendarData = [];
@@ -53,10 +55,10 @@ class Calendar
         return mb_strpos($callBackData, self::SELECTED_DATE_PREFIX) !== false;
     }
 
-    public function parseDate(string $callBackData = null): \DateTime
+    public function parseDate(string $callBackData = null): \DateTimeImmutable
     {
         if (empty($callBackData)) {
-            return new \DateTime();
+            return new \DateTimeImmutable();
         }
 
         if (mb_strpos($callBackData, self::PREV_MONTH_PREFIX) !== false) {
@@ -69,7 +71,7 @@ class Calendar
             throw new \Exception('Ошибка при парсинге выбранной даты');
         }
 
-        return new \DateTime($dateStr);
+        return new \DateTimeImmutable($dateStr);
     }
 
     private function addMonthName(string $monthName): void
@@ -94,14 +96,19 @@ class Calendar
         $this->calendarData[] = $dayOfWeekRow;
     }
 
-    private function addMonthNumbers(\DateTime $date): void
+    private function addMonthNumbers(\DateTimeImmutable $date): void
     {
         $dayOfMonth = 1;
         $row = [];
         $isPushedFirstNumber = false;
+        $now = new \DateTimeImmutable();
         while (true) {
-            $monthDay = (new \DateTime($dayOfMonth.'-'.$date->format('m')
-                .'-'.$date->format('o')));
+            $monthDay = new \DateTimeImmutable($dayOfMonth.'-'.$date->format('m') .'-'.$date->format('o'));
+            if ($monthDay < $now) {
+                ++$dayOfMonth;
+                continue;
+            }
+
             $monthDayNumber = $monthDay->format('N');
 
             for ($day = 1; $day <= self::DAY_IN_A_WEEK; ++$day) {
@@ -141,7 +148,7 @@ class Calendar
         ];
     }
 
-    private function addFinalEmptyButtons(array $row)
+    private function addFinalEmptyButtons(array $row): void
     {
         if (!empty($row)) {
             if(count($row) < self::DAY_IN_A_WEEK) {
@@ -153,18 +160,27 @@ class Calendar
         }
     }
 
-    private function addArrows(\DateTime $date)
+    private function addArrows(\DateTimeImmutable $date): void
     {
+        $prevMonth = [];
 
-        $this->calendarData[] = [
-            [
+        if($date->modify('last day of previous month') >= new \DateTimeImmutable()) {
+            $prevMonth = [
                 'text' => '<',
-                'callback_data' => self::PREV_MONTH_PREFIX . '-' . $date->modify('-1 month')->format('Y-m-d'),
-            ],
+                'callback_data' => self::PREV_MONTH_PREFIX . '-' . $date->modify('-1 month')->format('Y-m') . '-1',
+            ];
+        }
+
+        $arrows = [
+            $prevMonth,
             [
                 'text' => '>',
-                'callback_data' => self::NEXT_MONTH_PREFIX . '-' . $date->modify('+2 month')->format('Y-m-d'),
+                'callback_data' => self::NEXT_MONTH_PREFIX . '-' . $date->modify('+1 month')->format('Y-m') . '-1',
             ],
         ];
+
+        Log::debug(var_export(array_values(array_filter($arrows)), true));
+
+        $this->calendarData[] = array_values(array_filter($arrows));
     }
 }
