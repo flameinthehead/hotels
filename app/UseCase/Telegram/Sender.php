@@ -32,7 +32,7 @@ class Sender
         $this->makeRequest('sendMessage', $request);
     }
 
-    public function editMessage(int $chatId, int $messageId, string $newMessage, array $buttons = [])
+    public function editMessage(int $chatId, int $messageId, string $newMessage, array $buttons = []): void
     {
         $request = [
             'chat_id' => $chatId,

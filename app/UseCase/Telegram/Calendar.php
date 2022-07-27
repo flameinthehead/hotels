@@ -12,6 +12,9 @@ class Calendar
     private const NEXT_MONTH_PREFIX = 'next-month';
     private const PREV_MONTH_PREFIX = 'prev-month';
     private const SELECTED_DATE_PREFIX = 'select-date';
+    private const EMPTY_PREFIX = 'empty';
+    private const DAY_PREFIX = 'day';
+    private const MONTH_PREFIX = 'month-name';
 
     public const RU_MONTH_LIST = [
         '01' => 'январь',
@@ -74,12 +77,21 @@ class Calendar
         return new \DateTimeImmutable($dateStr);
     }
 
+    public function isUselessCallBackData(string $callBackData): bool
+    {
+        return (
+            $callBackData == self::EMPTY_PREFIX
+            || mb_strpos($callBackData, self::DAY_PREFIX) !== false
+            || mb_strpos($callBackData, self::MONTH_PREFIX) !== false
+        );
+    }
+
     private function addMonthName(string $monthName): void
     {
         $this->calendarData[] = [
             [
                 'text' => self::RU_MONTH_LIST[$monthName],
-                'callback_data'=> 'month-'.$monthName,
+                'callback_data'=> self::MONTH_PREFIX . '-' . $monthName,
             ]
         ];
     }
@@ -90,7 +102,7 @@ class Calendar
         for ($i = 1; $i <= self::DAY_IN_A_WEEK; ++$i) {
             $dayOfWeekRow[] = [
                 'text' => self::RU_DAY_OF_WEEK_LIST[$i],
-                'callback_data'=> 'day-'.$i,
+                'callback_data'=> self::DAY_PREFIX . '-' . $i,
             ];
         }
         $this->calendarData[] = $dayOfWeekRow;
@@ -144,7 +156,7 @@ class Calendar
     {
         $data[] = [
             'text' => ' ',
-            'callback_data' => ' ',
+            'callback_data' => self::EMPTY_PREFIX,
         ];
     }
 
@@ -178,8 +190,6 @@ class Calendar
                 'callback_data' => self::NEXT_MONTH_PREFIX . '-' . $date->modify('+1 month')->format('Y-m') . '-1',
             ],
         ];
-
-        Log::debug(var_export(array_values(array_filter($arrows)), true));
 
         $this->calendarData[] = array_values(array_filter($arrows));
     }

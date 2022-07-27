@@ -143,6 +143,10 @@ class Service
         }
 
         if (!empty($callBackMessageId) && !$this->calendar->isSelectedDate($callBackData)) {
+            if ($this->calendar->isUselessCallBackData($callBackData)) {
+               return;
+            }
+
             $this->sender->editMessage(
                 $fromId,
                 $callBackMessageId,
