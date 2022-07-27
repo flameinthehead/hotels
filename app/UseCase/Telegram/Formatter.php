@@ -15,6 +15,7 @@ class Formatter
         $messages = [];
         foreach ($searchResults as $oneResult) {
             $messageData = [
+                $oneResult->getStars() ? str_repeat(Smiles::STAR, $oneResult->getStars()) : null,
                 sprintf('%s Название: <b>%s</b>', Smiles::HOTEL, $oneResult->getName()),
                 $this->getDates($oneResult),
                 sprintf('%s Адрес: <b><a href="https://yandex.ru/maps/?text=%s">%s</a></b>',
@@ -22,7 +23,6 @@ class Formatter
                     $oneResult->getAddress(),
                     $oneResult->getAddress()
                 ),
-                $oneResult->getStars() ? sprintf('%s %s', $oneResult->getStars(), Smiles::STAR) : '',
                 sprintf('%s Полная стоимость: <b>%s руб.</b>', Smiles::CREDIT_CARD, $oneResult->getPrice()),
                 $this->getFacilities($oneResult),
                 $this->getDistanceToCenter($oneResult),
@@ -35,7 +35,7 @@ class Formatter
                     : self::NO_PHOTO . $oneResult->getName()
             );
 
-            $messages[$photo] = implode("\r\n\r\n", $messageData);
+            $messages[$photo] = implode("\r\n\r\n", array_filter($messageData));
         }
 
         return $messages;

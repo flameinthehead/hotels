@@ -66,7 +66,10 @@ class ResultFactory implements SearchResultFactory
         $result->setCheckInDate($checkInDate);
         $result->setCheckOutDate($checkOutDate);
         $result->setAddress($searchResult['static_vm']['address']);
-        $result->setStars(($searchResult['static_vm']['star_raiting']) / 10);
+        $result->setStars(
+            !empty($searchResult['static_vm']['star_rating'])
+                ? (($searchResult['static_vm']['star_rating']) / 10)
+                : null);
 
         return $result;
     }

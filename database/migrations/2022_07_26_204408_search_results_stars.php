@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('search_results', function (Blueprint $table) {
-            $table->integer('stars');
+            $table->integer('stars')->nullable();
         });
     }
 

@@ -155,7 +155,7 @@ class Result extends Model
         $this->attributes['stars'] = $stars;
     }
 
-    public function getStars(): int
+    public function getStars(): ?int
     {
         return $this->stars;
     }
