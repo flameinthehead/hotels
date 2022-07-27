@@ -41,6 +41,7 @@ class ResultFactory implements SearchResultFactory
         $result->setCheckInDate(new \DateTime($params->getCheckinDate()));
         $result->setCheckOutDate(new \DateTime($params->getCheckoutDate()));
         $result->setAddress($searchResult['hotel']['address']);
+        $result->setStars($searchResult['hotel']['stars']);
 
         return $result;
     }

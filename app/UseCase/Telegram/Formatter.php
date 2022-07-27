@@ -22,6 +22,7 @@ class Formatter
                     $oneResult->getAddress(),
                     $oneResult->getAddress()
                 ),
+                $oneResult->getStars() ? sprintf('%s %s', $oneResult->getStars(), Smiles::STAR) : '',
                 sprintf('%s Полная стоимость: <b>%s руб.</b>', Smiles::CREDIT_CARD, $oneResult->getPrice()),
                 $this->getFacilities($oneResult),
                 $this->getDistanceToCenter($oneResult),

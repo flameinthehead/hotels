@@ -149,4 +149,14 @@ class Result extends Model
     {
         return $this->address;
     }
+
+    public function setStars(?int $stars): void
+    {
+        $this->attributes['stars'] = $stars;
+    }
+
+    public function getStars(): int
+    {
+        return $this->stars;
+    }
 }
