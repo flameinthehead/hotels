@@ -127,9 +127,13 @@ class TelegramRequestWorkflowSubscriber
     public function onGuardChooseAdults(GuardEvent $event): void
     {
         $telegramRequest = $event->getSubject();
-        if (!is_numeric($telegramRequest->getLastMessage())) {
+        if (
+            !is_numeric($telegramRequest->getLastMessage())
+            || $telegramRequest->getLastMessage() < 1
+            || $telegramRequest->getLastMessage() > 10
+        ) {
             $event->addTransitionBlocker(
-                new TransitionBlocker('Необходимо ввести число', '403')
+                new TransitionBlocker('Необходимо ввести число от 1 до 10', '403')
             );
         }
     }
