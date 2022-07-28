@@ -7,14 +7,14 @@ return [
             'property' => 'status', // this is the property on the model, defaults to 'marking'
         ],
         'supports' => ['App\Models\TelegramRequest'],
-        'places' => ['new', 'city', 'check_in', 'check_out', 'adults'],
+        'places' => ['new', 'city', 'check_in', 'check_out', 'adults', 'stars'],
         'transitions' => [
             'choose_city' => [
                 'from' => 'new',
                 'to' => 'city',
                 'metadata' => [
                     'next_message' => 'Выберите дату заезда',
-                    'needCalendar' => true,
+                    'need_calendar' => true,
                 ]
             ],
             'choose_check_in' => [
@@ -22,7 +22,7 @@ return [
                 'to' => 'check_in',
                 'metadata' => [
                     'next_message' => 'Выберите дату отъезда',
-                    'needCalendar' => true,
+                    'need_calendar' => true,
                 ]
             ],
             'choose_check_out' => [
@@ -35,6 +35,14 @@ return [
             'choose_adults' => [
                 'from' => 'check_out',
                 'to' => 'adults',
+                'metadata' => [
+                    'next_message' => 'Выберите минимальное количество звёзд',
+                    'need_stars' => true
+                ],
+            ],
+            'choose_minimum_stars' => [
+                'from' => 'adults',
+                'to' => 'stars',
                 'metadata' => [
                     'is_final_message' => true
                 ],

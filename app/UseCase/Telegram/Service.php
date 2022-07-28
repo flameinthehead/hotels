@@ -17,7 +17,8 @@ class Service
         private TelegramRequest $entity,
         private Sender $sender,
         private Calendar $calendar,
-        private Formatter $formatter
+        private Formatter $formatter,
+        private Stars $stars
     ) {
     }
 
@@ -157,16 +158,21 @@ class Service
         }
 
 
-        if (empty($transitionMetadata['needCalendar'])) {
+        if (isset($transitionMetadata['need_calendar']) && $transitionMetadata['need_calendar'] === true) {
+            $this->sender->sendMessage(
+                $fromId,
+                $transitionMetadata['next_message'],
+                $this->calendar->makeCalendar($callBackData)
+            );
+        } elseif(isset($transitionMetadata['need_stars']) && $transitionMetadata['need_stars'] === true) {
+            $this->sender->sendMessage(
+                $fromId,
+                $transitionMetadata['next_message'],
+                $this->stars->makeButtons(),
+            );
+        } else {
             $this->sender->sendMessage($fromId, $transitionMetadata['next_message']);
-            return;
         }
-
-        $this->sender->sendMessage(
-            $fromId,
-            $transitionMetadata['next_message'],
-            $this->calendar->makeCalendar($callBackData)
-        );
     }
 
     private function getSearchParamsByTelegramRequest(TelegramRequest $tgRequest): Params

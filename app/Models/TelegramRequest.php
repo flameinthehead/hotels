@@ -102,4 +102,14 @@ class TelegramRequest extends Model
     {
         $this->is_finished = $isFinished;
     }
+
+    public function setStars(int $stars): void
+    {
+        $this->stars = $stars;
+    }
+
+    public function getStars(): int
+    {
+        return $this->stars;
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Models\City;
 use App\Models\TelegramRequest;
 use App\UseCase\Telegram\Calendar;
+use App\UseCase\Telegram\Stars;
 use Illuminate\Events\Dispatcher;
 use ZeroDaHero\LaravelWorkflow\Events\CompletedEvent;
 use Symfony\Component\Workflow\TransitionBlocker;
@@ -17,7 +18,7 @@ class TelegramRequestWorkflowSubscriber
      *
      * @return void
      */
-    public function __construct(private Calendar $calendar)
+    public function __construct(private Calendar $calendar, private Stars $stars)
     {
     }
 
@@ -68,6 +69,16 @@ class TelegramRequestWorkflowSubscriber
         $events->listen(
             'workflow.telegram_request.completed.choose_adults',
             [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onCompletedChooseAdults'],
+        );
+
+        $events->listen(
+            'workflow.telegram_request.guard.choose_minimum_stars',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onGuardChooseStars'],
+        );
+
+        $events->listen(
+            'workflow.telegram_request.completed.choose_minimum_stars',
+            [\App\Listeners\TelegramRequestWorkflowSubscriber::class, 'onCompletedChooseStars'],
         );
     }
 
@@ -143,5 +154,24 @@ class TelegramRequestWorkflowSubscriber
         /** @var TelegramRequest $telegramRequest */
         $telegramRequest = $event->getSubject();
         $telegramRequest->setAdults($telegramRequest->getLastMessage());
+    }
+
+    public function onGuardChooseStars(GuardEvent $event): void
+    {
+        /** @var TelegramRequest $telegramRequest */
+        $telegramRequest = $event->getSubject();
+
+        if (mb_strpos($telegramRequest->getLastMessage(), Stars::PREFIX_STARS) === false) {
+            $event->addTransitionBlocker(
+                new TransitionBlocker('Необходимо выбрать одно из значений', '403')
+            );
+        }
+    }
+
+    public function onCompletedChooseStars(CompletedEvent $event): void
+    {
+        /** @var TelegramRequest $telegramRequest */
+        $telegramRequest = $event->getSubject();
+        $telegramRequest->setStars($this->stars->parseStarsCount($telegramRequest->getLastMessage()));
     }
 }

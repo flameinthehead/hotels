@@ -29,7 +29,11 @@ class FinishSearch implements ShouldQueue
     public function handle(Sender $sender, Service $telegramService, Sorter $sorter): void
     {
         try {
-            $results = $this->searchRequest->searchResults()->get()->all();
+            $results = $this->searchRequest->searchResults()
+                ->where('stars', '>=', $this->searchRequest->telegramRequest->stars)
+                ->get()
+                ->all();
+
             $fromId = $this->searchRequest->telegramRequest->telegram_from_id;
             $sender->sendMessage($fromId, 'Поиск завершён'.(empty($results) ? ' - ничего не найдено' : '').'.');
             if (!empty($results)) {
