@@ -9,6 +9,7 @@ use App\Models\YandexCity;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\Serializer;
 
@@ -31,7 +32,7 @@ class Search implements SearchSourceInterface
             throw new \Exception('Не заданы параметры поиска');
         }
 
-        if (!empty($searchRequest->telegramRequest->stars)) {
+        if (!empty($searchRequest->telegramRequest->stars) && $searchRequest->telegramRequest->stars > 0) {
             $this->params->setFilterStars($searchRequest->telegramRequest->stars);
         }
 
@@ -81,8 +82,12 @@ class Search implements SearchSourceInterface
 
     public function getOptions(): array
     {
+        $query = $this->serializer->normalize($this->params, 'array');
+        if(!$this->params->getFilterAtoms()) {
+            unset($query['filterAtoms']);
+        }
         return [
-            RequestOptions::QUERY => $this->serializer->normalize($this->params, 'array'),
+            RequestOptions::QUERY => $query,
             RequestOptions::HEADERS => [
                 "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 "Accept-Encoding" => "gzip, deflate, br",

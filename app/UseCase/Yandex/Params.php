@@ -9,11 +9,11 @@ class Params implements SearchParamsFactoryInterface
     public const SORT_CHEAP_FIRST = 'cheap-first';
 
     public const STARS = [
-        1 => 'stars:one',
-        2 => 'stars:two',
-        3 => 'stars:three',
-        4 => 'stars:four',
-        5 => 'stars:five',
+        1 => 'star:one',
+        2 => 'star:two',
+        3 => 'star:three',
+        4 => 'star:four',
+        5 => 'star:five',
     ];
 
     private string $startSearchReason = 'mount';
@@ -41,7 +41,7 @@ class Params implements SearchParamsFactoryInterface
 
     private string $geoLocationStatus = 'unknown';
 
-    private array $filterAtoms = ['star:three', 'star:four', 'star:five'];
+    private array $filterAtoms = [];
 
     /**
      * @return string

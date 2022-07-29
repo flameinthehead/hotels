@@ -32,12 +32,11 @@ class Search implements SearchSourceInterface
             throw new \Exception('Не заданы параметры поиска');
         }
 
-        if (!empty($searchRequest->telegramRequest->stars)) {
+        if (!empty($searchRequest->telegramRequest->stars) && $searchRequest->telegramRequest->stars > 0) {
             $this->params->setFilterStars($searchRequest->telegramRequest->stars);
         }
 
         $requestArr = [];
-
         $options = $this->getOptions();
         foreach ($proxyList as $proxyModel) {
             $options[RequestOptions::PROXY] = $proxyModel->address;
@@ -115,6 +114,10 @@ class Search implements SearchSourceInterface
             'sort' => 'price_asc',
             'filters' => $this->params->getFilter()
         ];
+
+        if (empty($json['filters'])) {
+            unset($json['filters']);
+        }
 
         return [
             RequestOptions::JSON => json_decode(json_encode($json)),
