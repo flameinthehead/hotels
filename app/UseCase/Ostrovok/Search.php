@@ -32,6 +32,10 @@ class Search implements SearchSourceInterface
             throw new \Exception('Не заданы параметры поиска');
         }
 
+        if (!empty($searchRequest->telegramRequest->stars)) {
+            $this->params->setFilterStars($searchRequest->telegramRequest->stars);
+        }
+
         $requestArr = [];
 
         $options = $this->getOptions();
@@ -108,7 +112,8 @@ class Search implements SearchSourceInterface
             ],
             'page' => 1,
             'map_hotels' => true,
-            'sort' => 'price_asc'
+            'sort' => 'price_asc',
+            'filters' => $this->params->getFilter()
         ];
 
         return [

@@ -6,6 +6,14 @@ use App\UseCase\Search\SearchParamsFactoryInterface;
 
 class Params implements SearchParamsFactoryInterface
 {
+    public const STARS = [
+        1 => 10,
+        2 => 20,
+        3 => 30,
+        4 => 40,
+        5 => 50,
+    ];
+
     private string $departureDate;
 
     private string $arrivalDate;
@@ -13,6 +21,8 @@ class Params implements SearchParamsFactoryInterface
     private int $regionId;
 
     private int $adults;
+
+    private array $filter = [];
 
     public function getDepartureDate(): string
     {
@@ -62,5 +72,28 @@ class Params implements SearchParamsFactoryInterface
         $params->setAdults($generalParams->getAdults());
         $params->setRegionId($generalParams->getCity()->ostrovokCity()->first()->ostrovok_city_id);
         return $params;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilter(): array
+    {
+        return $this->filter;
+    }
+
+    /**
+     * @param array $filter
+     */
+    public function setFilter(array $filter): void
+    {
+        $this->filter = $filter;
+    }
+
+    public function setFilterStars(int $stars): void
+    {
+        for ($i = $stars; $i <= 5; ++$i) {
+            $this->filter['stars'][] = self::STARS[$i];
+        }
     }
 }

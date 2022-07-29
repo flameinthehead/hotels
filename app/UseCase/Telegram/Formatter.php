@@ -20,7 +20,7 @@ class Formatter
                 $this->getDates($oneResult),
                 sprintf('%s Адрес: <b><a href="https://yandex.ru/maps/?text=%s">%s</a></b>',
                     Smiles::ROUND_PUSHPIN,
-                    $oneResult->getAddress(),
+                    urlencode($oneResult->getAddress()),
                     $oneResult->getAddress()
                 ),
                 sprintf('%s Полная стоимость: <b>%s руб.</b>', Smiles::CREDIT_CARD, $oneResult->getPrice()),

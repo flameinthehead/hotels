@@ -257,7 +257,7 @@ class Params implements SearchParamsFactoryInterface
 
     public function setFilterStars(int $stars): void
     {
-        for ($i = 1; $i <= $stars; ++$i) {
+        for ($i = $stars; $i <= 5; ++$i) {
             $this->filterAtoms[] = self::STARS[$i];
         }
     }
