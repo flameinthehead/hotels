@@ -31,6 +31,10 @@ class Search implements SearchSourceInterface
             throw new \Exception('Не заданы параметры поиска');
         }
 
+        if (!empty($searchRequest->telegramRequest->stars)) {
+            $this->params->setFilterStars($searchRequest->telegramRequest->stars);
+        }
+
         $options = $this->getOptions();
         $response = $this->getResponse($options, $proxyList);
 

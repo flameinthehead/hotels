@@ -8,14 +8,22 @@ class Params implements SearchParamsFactoryInterface
 {
     public const SORT_CHEAP_FIRST = 'cheap-first';
 
+    public const STARS = [
+        1 => 'stars:one',
+        2 => 'stars:two',
+        3 => 'stars:three',
+        4 => 'stars:four',
+        5 => 'stars:five',
+    ];
+
     private string $startSearchReason = 'mount';
 
     // количество отелей на странице
-    private int $pageHotelCount = 25;
+    private int $pageHotelCount = 50;
 
-    private int $pricedHotelLimit = 26;
+    private int $pricedHotelLimit = 51;
 
-    private int $totalHotelLimit = 50;
+    private int $totalHotelLimit = 100;
 
     private int $pollIteration = 0;
 
@@ -32,6 +40,8 @@ class Params implements SearchParamsFactoryInterface
     private string $selectedSortId = self::SORT_CHEAP_FIRST;
 
     private string $geoLocationStatus = 'unknown';
+
+    private array $filterAtoms = ['star:three', 'star:four', 'star:five'];
 
     /**
      * @return string
@@ -227,5 +237,28 @@ class Params implements SearchParamsFactoryInterface
         $params->setGeoId($generalParams->getCity()->yandexCity()->first()->yandex_city_id);
 
         return $params;
+    }
+
+    /**
+     * @return array|string[]
+     */
+    public function getFilterAtoms(): array
+    {
+        return $this->filterAtoms;
+    }
+
+    /**
+     * @param array|string[] $filterAtoms
+     */
+    public function setFilterAtoms(array $filterAtoms): void
+    {
+        $this->filterAtoms = $filterAtoms;
+    }
+
+    public function setFilterStars(int $stars): void
+    {
+        for ($i = 1; $i <= $stars; ++$i) {
+            $this->filterAtoms[] = self::STARS[$i];
+        }
     }
 }
