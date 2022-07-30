@@ -2,8 +2,6 @@
 
 namespace App\UseCase\Telegram;
 
-use Illuminate\Support\Facades\Log;
-
 class Calendar
 {
     private array $calendarData = [];
@@ -113,10 +111,10 @@ class Calendar
         $dayOfMonth = 1;
         $row = [];
         $isPushedFirstNumber = false;
-        $now = new \DateTimeImmutable();
+        $maxDays = $date->format('t');
         while (true) {
             $monthDay = new \DateTimeImmutable($dayOfMonth.'-'.$date->format('m') .'-'.$date->format('o'));
-            if ($monthDay < $now) {
+            if ($monthDay < $date) {
                 ++$dayOfMonth;
                 continue;
             }
@@ -145,10 +143,15 @@ class Calendar
 
             ++$dayOfMonth;
 
-            if ($dayOfMonth == $date->format('t')) {
+            if ($dayOfMonth > $maxDays) {
                 $this->addFinalEmptyButtons($row);
                 break;
             }
+
+            /*if ($dayOfMonth == $date->format('t')) {
+
+                break;
+            }*/
         }
     }
 
