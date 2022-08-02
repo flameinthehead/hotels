@@ -13,7 +13,7 @@ class UpdateProxy extends Migration
      */
     public function up()
     {
-        Schema::drop('proxies_additional');
+        Schema::dropIfExists('proxies_additional');
         Schema::table('proxies', function (Blueprint $table) {
             $table->char('yandex')->nullable();
         });
