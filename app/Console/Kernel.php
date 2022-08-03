@@ -21,8 +21,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $this->updateProxy($schedule);
-         $this->checkProxy($schedule);
+        $sources = config('proxy.sources');
+        foreach($sources as $source => $class) {
+            $schedule->command('proxy:update ' . $class::SOURCE)->hourly();
+        }
+        $schedule->command('proxy:check yandex')->everyFifteenMinutes();
+        $schedule->command('proxy:check ostrovok')->everyFifteenMinutes();
     }
 
     /**
@@ -35,20 +39,5 @@ class Kernel extends ConsoleKernel
         $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
-    }
-
-    // обновление прокси с сайтов
-    private function updateProxy(Schedule $schedule): void
-    {
-        $sources = config('proxy.sources');
-        foreach($sources as $source => $class) {
-            $schedule->command('proxy:update ' . $class::SOURCE)->daily();
-        }
-    }
-
-    // проверка полученных прокси на пригодность
-    private function checkProxy(Schedule $schedule): void
-    {
-        $schedule->command('proxy:check yandex')->hourly();
     }
 }

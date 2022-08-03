@@ -3,6 +3,7 @@
 namespace App\UseCase\Yandex;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class Suggestions
 {
@@ -27,6 +28,10 @@ class Suggestions
         $content = $result->getBody()->getContents();
 
         $decoded = json_decode($content, true);
+
+        Log::debug('Yandex suggestions');
+        Log::debug($decoded);
+
         if (!isset($decoded['data']['items']) || !is_array($decoded['data']['items'])) {
             throw new \Exception('Не корректный формат ответа от Suggestions');
         }
