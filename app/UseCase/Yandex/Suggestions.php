@@ -30,7 +30,7 @@ class Suggestions
         $decoded = json_decode($content, true);
 
         Log::debug('Yandex suggestions');
-        Log::debug($decoded);
+        Log::debug($content);
 
         if (!isset($decoded['data']['items']) || !is_array($decoded['data']['items'])) {
             throw new \Exception('Не корректный формат ответа от Suggestions');
