@@ -18,6 +18,7 @@ class Proxy extends Model
     {
         $query = self::query();
         if (!empty($source) && Schema::hasColumn($this->getTable(), $source)) {
+            $query->select('address');
             $query->where(function ($query) use ($source) {
                 /* @var Builder $query */
                 $query->where($source, '1');
@@ -31,7 +32,7 @@ class Proxy extends Model
 
         $query->orderBy('updated_at', 'DESC');
 
-        return $query->get()->all();
+        return $query->get()->pluck('address')->all();
     }
 
     public function getRandBySource(string $source): self

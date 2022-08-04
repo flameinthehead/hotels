@@ -54,13 +54,15 @@ class Checker
         ProgressBar $bar
     ): void {
         $options = $this->setSearchParams($searchSource)->getOptions();
+        $resultSuccess = [];
+        $resultFailed = [];
         foreach($proxyForCheckerChunked as $chunk){
             $bar->advance();
             $requestArr = [];
-            /** @var Proxy $proxy */
-            foreach($chunk as $proxy) {
-                $options[RequestOptions::PROXY] = $proxy->address;
-                $requestArr[$proxy->address] = $client->getAsync(
+
+            foreach($chunk as $proxyAddress) {
+                $options[RequestOptions::PROXY] = $proxyAddress;
+                $requestArr[$proxyAddress] = $client->getAsync(
                     $searchSource->getUrl(),
                     $options
                 );
@@ -70,8 +72,6 @@ class Checker
             unset($requestArr);
 
             foreach ($responses as $proxyAddress => $item) {
-                $proxyModel = Proxy::where('address', $proxyAddress)->firstOrFail();
-
                 if (
                     isset($item['value'])
                     && $item['value'] instanceof ResponseInterface
@@ -79,15 +79,21 @@ class Checker
                     && ($content = json_decode($item['value']->getBody()->getContents(), true))
                     && $searchSource->isValidResponse($content)
                 ) {
-                    $proxyModel->{$searchSourceCode} = '1';
+                    $resultSuccess[$proxyAddress] = '1';
                 } else {
-                    $proxyModel->{$searchSourceCode} = '0';
+                    $resultFailed[$proxyAddress] = '0';
                 }
-                $proxyModel->save();
                 unset($content);
-                unset($proxyModel);
             }
             unset($responses);
+        }
+
+        if(!empty($resultFailed)) {
+            Proxy::query()->where('address', array_keys($resultFailed))->update([$searchSourceCode => '0']);
+        }
+
+        if(!empty($resultSuccess)) {
+            Proxy::query()->where('address', array_keys($resultSuccess))->update([$searchSourceCode => '1']);
         }
     }
 
