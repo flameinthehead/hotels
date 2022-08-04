@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 class Suggestions
 {
     public const BASE_URL_PATTERN = 'https://travel.yandex.ru/api/hotels/searchSuggest?query={query}&pathname=%2Fhotels%2F&limit=1&language=ru&domain=ru';
-    public const TIMEOUT = 5;
+    public const TIMEOUT = 10;
 
     public function __construct(private Client $client, private Proxy $proxy)
     {
