@@ -21,12 +21,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $sources = config('proxy.sources');
-        foreach($sources as $source => $class) {
-            $schedule->command('proxy:update ' . $class::SOURCE)->hourly();
-        }
-        $schedule->command('proxy:check yandex')->everyFifteenMinutes();
-        $schedule->command('proxy:check ostrovok')->everyFifteenMinutes();
+        $schedule->command('proxy:update')->hourly();
+        $schedule->command('proxy:check yandex')->hourly();
+        $schedule->command('proxy:check ostrovok')->hourly();
     }
 
     /**
