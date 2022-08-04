@@ -20,11 +20,13 @@ class Suggestions
         $proxyList = $this->proxy->getAllEnabledBySource('yandex');
 
         $requestArr = [];
+        $options = [];
         foreach ($proxyList as $proxyModel) {
             $options[RequestOptions::PROXY] = $proxyModel->address;
 
             $requestArr[$proxyModel->address] = $this->client->getAsync(
-                str_replace('{query}', $cityName, self::BASE_URL_PATTERN)
+                str_replace('{query}', $cityName, self::BASE_URL_PATTERN),
+                $options
             );
         }
 
