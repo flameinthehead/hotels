@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 class Suggestions
 {
     public const BASE_URL_PATTERN = 'https://ostrovok.ru/api/site/multicomplete.json?query={query}&locale=ru';
+    public const TIMEOUT = 5;
 
     public function __construct(private Client $client, private Proxy $proxy)
     {
@@ -20,7 +21,9 @@ class Suggestions
         $proxyList = $this->proxy->getAllEnabledBySource('ostrovok');
 
         $requestArr = [];
-        $options = [];
+        $options = [
+            RequestOptions::TIMEOUT => self::TIMEOUT
+        ];
         foreach ($proxyList as $proxyModel) {
             $options[RequestOptions::PROXY] = $proxyModel->address;
 
