@@ -2,46 +2,50 @@
 
 namespace App\UseCase\Ostrovok;
 
+use App\Models\Proxy;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\ResponseInterface;
 
 class Suggestions
 {
     public const BASE_URL_PATTERN = 'https://ostrovok.ru/api/site/multicomplete.json?query={query}&locale=ru';
 
-    public function __construct(private Client $client)
+    public function __construct(private Client $client, private Proxy $proxy)
     {
     }
 
-    public function findByCityName(string $cityName)
+    public function findByCityName(string $cityName): int
     {
-        $result = $this->client->request(
-            'GET',
-            str_replace('{query}', $cityName,
-                self::BASE_URL_PATTERN)
-        );
+        $proxyList = $this->proxy->getAllEnabledBySource('ostrovok');
 
-        if ($result->getStatusCode() !== 200) {
-            throw new \Exception('Не удалось получить ответ в Suggestions');
+        $requestArr = [];
+        foreach ($proxyList as $proxyModel) {
+            $options[RequestOptions::PROXY] = $proxyModel->address;
+
+            $requestArr[$proxyModel->address] = $this->client->getAsync(
+                str_replace('{query}', $cityName, self::BASE_URL_PATTERN)
+            );
         }
 
-        $content = $result->getBody()->getContents();
-        $decoded = json_decode($content, true);
-        if (!isset($decoded['regions'])) {
-            throw new \Exception('Не удалось найти города в Ostrovok');
-        }
+        $responses = \GuzzleHttp\Promise\settle($requestArr)->wait();
 
-        $cityId = null;
-        foreach ($decoded['regions'] as $region) {
-            if ($region['type'] == 'City') {
-                $cityId = $region['id'];
-                break;
+        foreach ($responses as $responseItem) {
+            if (!isset($responseItem['value']) || !($responseItem['value'] instanceof ResponseInterface)) {
+                continue;
+            }
+            $decoded = json_decode($responseItem['value']->getBody()->getContents(), true);
+            if (!isset($decoded['regions'])) {
+                continue;
+            }
+
+            foreach ($decoded['regions'] as $region) {
+                if ($region['type'] == 'City') {
+                    return $region['id'];
+                }
             }
         }
 
-        if (empty($cityId)) {
-            throw new \Exception('Пустой cityId');
-        }
-
-        return $cityId;
+        throw new \Exception('Ostrovok - Не корректный формат ответа от Suggestions');
     }
 }
