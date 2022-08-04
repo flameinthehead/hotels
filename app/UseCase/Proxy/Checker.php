@@ -56,6 +56,7 @@ class Checker
         $options = $this->setSearchParams($searchSource)->getOptions();
         $resultSuccess = [];
         $resultFailed = [];
+        $searchSourceUrl = $searchSource->getUrl();
         foreach($proxyForCheckerChunked as $chunk){
             $bar->advance();
             $requestArr = [];
@@ -63,7 +64,7 @@ class Checker
             foreach($chunk as $proxyAddress) {
                 $options[RequestOptions::PROXY] = $proxyAddress;
                 $requestArr[$proxyAddress] = $client->getAsync(
-                    $searchSource->getUrl(),
+                    $searchSourceUrl,
                     $options
                 );
             }
@@ -91,10 +92,12 @@ class Checker
         if(!empty($resultFailed)) {
             Proxy::query()->where('address', array_keys($resultFailed))->update([$searchSourceCode => '0']);
         }
+        unset($resultFailed);
 
         if(!empty($resultSuccess)) {
             Proxy::query()->where('address', array_keys($resultSuccess))->update([$searchSourceCode => '1']);
         }
+        unset($resultSuccess);
     }
 
     private function setSearchParams(SearchSourceInterface $searchSource): SearchSourceInterface
