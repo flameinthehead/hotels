@@ -54,10 +54,11 @@ class Checker
         ProgressBar $bar
     ): void {
         $options = $this->setSearchParams($searchSource)->getOptions();
-        $resultSuccess = [];
-        $resultFailed = [];
+
         $searchSourceUrl = $searchSource->getUrl();
         foreach($proxyForCheckerChunked as $chunk){
+            $resultSuccess = [];
+            $resultFailed = [];
             $bar->advance();
             $requestArr = [];
 
@@ -87,17 +88,15 @@ class Checker
                 unset($content);
             }
             unset($responses);
-        }
 
-        if(!empty($resultFailed)) {
-            Proxy::query()->where('address', array_keys($resultFailed))->update([$searchSourceCode => '0']);
-        }
-        unset($resultFailed);
+            if(!empty($resultFailed)) {
+                Proxy::query()->whereIn('address', array_keys($resultFailed))->update([$searchSourceCode => '0']);
+            }
 
-        if(!empty($resultSuccess)) {
-            Proxy::query()->where('address', array_keys($resultSuccess))->update([$searchSourceCode => '1']);
+            if(!empty($resultSuccess)) {
+                Proxy::query()->whereIn('address', array_keys($resultSuccess))->update([$searchSourceCode => '1']);
+            }
         }
-        unset($resultSuccess);
     }
 
     private function setSearchParams(SearchSourceInterface $searchSource): SearchSourceInterface
