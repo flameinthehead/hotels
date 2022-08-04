@@ -53,14 +53,13 @@ class Checker
         string $searchSourceCode,
         ProgressBar $bar
     ): void {
+        $options = $this->setSearchParams($searchSource)->getOptions();
         foreach($proxyForCheckerChunked as $chunk){
             $bar->advance();
             $requestArr = [];
             /** @var Proxy $proxy */
             foreach($chunk as $proxy) {
-                $options = $this->setSearchParams($searchSource)->getOptions();
                 $options[RequestOptions::PROXY] = $proxy->address;
-
                 $requestArr[$proxy->address] = $client->getAsync(
                     $searchSource->getUrl(),
                     $options
@@ -68,6 +67,7 @@ class Checker
             }
 
             $responses = \GuzzleHttp\Promise\settle($requestArr)->wait();
+            unset($requestArr);
 
             foreach ($responses as $proxyAddress => $item) {
                 $proxyModel = Proxy::where('address', $proxyAddress)->firstOrFail();
@@ -84,6 +84,7 @@ class Checker
                     $proxyModel->{$searchSourceCode} = '0';
                 }
                 $proxyModel->save();
+                unset($content);
                 unset($proxyModel);
             }
             unset($responses);
