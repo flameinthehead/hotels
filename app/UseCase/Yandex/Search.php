@@ -50,7 +50,7 @@ class Search implements SearchSourceInterface
             $options['query']['pollIteration'] += 1;
             $options['query']['context'] = $response['data']['context'];
 
-            $response = $this->getResponse($options, $proxyList);
+            $response = $this->getResponse($options, $proxyList, $searchRequest->id);
         }
 
         foreach ($hotels as $row) {
@@ -120,7 +120,7 @@ class Search implements SearchSourceInterface
      * @return array
      * @throws YandexSearchException
      */
-    private function getResponse(array $options, array $proxyList): array
+    private function getResponse(array $options, array $proxyList, int $searchRequestId): array
     {
         $requestArr = [];
         foreach ($proxyList as $proxyModel) {
@@ -144,6 +144,6 @@ class Search implements SearchSourceInterface
             }
         }
 
-        throw new YandexSearchException('Yandex search invalid response');
+        throw new YandexSearchException('Yandex search invalid response, id = ' . $searchRequestId);
     }
 }
