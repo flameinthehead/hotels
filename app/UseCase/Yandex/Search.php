@@ -37,7 +37,7 @@ class Search implements SearchSourceInterface
         }
 
         $options = $this->getOptions();
-        $response = $this->getResponse($options, $proxyList);
+        $response = $this->getResponse($options, $proxyList, $searchRequest->id);
 
         $hotels = [];
 

@@ -46,6 +46,7 @@ class Search implements SearchSourceInterface
                 $options
             );
         }
+        unset($proxyList);
 
         $responses = \GuzzleHttp\Promise\settle($requestArr)->wait();
 
@@ -62,7 +63,7 @@ class Search implements SearchSourceInterface
         }
 
         if (empty($content)) {
-            throw new OstrovokSearchException('Ostrovok search invalid response');
+            throw new OstrovokSearchException('Ostrovok search invalid response, id = ' . $searchRequest->id);
         }
 
         foreach ($content['hotels'] as $row) {
