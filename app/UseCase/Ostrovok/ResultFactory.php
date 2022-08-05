@@ -3,6 +3,7 @@
 namespace App\UseCase\Ostrovok;
 
 use App\Models\Result;
+use App\UseCase\Search\BookUrlEncoderInterface;
 use App\UseCase\Search\SearchParamsFactoryInterface;
 use App\UseCase\Search\SearchResultFactory;
 use Illuminate\Support\Facades\Log;
@@ -13,8 +14,11 @@ class ResultFactory implements SearchResultFactory
     public const PREVIEW_WIDTH = '640';
     public const PREVIEW_HEIGHT = '400';
 
-    public static function makeResult(array $searchResult, SearchParamsFactoryInterface $params): ?Result
-    {
+    public static function makeResult(
+        array $searchResult,
+        SearchParamsFactoryInterface $params,
+        BookUrlEncoderInterface $bookUrlEncoder
+    ): ?Result {
         $hotelName = $searchResult['static_vm']['name'] ?? null;
         $price = $searchResult['rates'][0]['payment_options']['payment_types'][0]['amount'] ?? null;
 
@@ -56,7 +60,7 @@ class ResultFactory implements SearchResultFactory
         $result = new Result();
         $result->setName($hotelName);
         $result->setPrice($price);
-        $result->setBookLink($bookLink);
+        $result->setBookLink($bookUrlEncoder->encode($bookLink));
         $result->setFacilities($facilities);
         $result->setDistanceToCenter($distanceToCenter);
         $result->setHotelPreview($preview);

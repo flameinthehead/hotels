@@ -22,8 +22,12 @@ class Search implements SearchSourceInterface
 
     private Params $params;
 
-    public function __construct(private Client $client, private Serializer $serializer, private Suggestions $suggestions)
-    {
+    public function __construct(
+        private Client $client,
+        private Serializer $serializer,
+        private Suggestions $suggestions,
+        private BookUrlEncoder $bookUrlEncoder
+    ) {
     }
 
     public function search(array $proxyList, SearchRequest $searchRequest): void
@@ -54,7 +58,7 @@ class Search implements SearchSourceInterface
         }
 
         foreach ($hotels as $row) {
-            $oneResult = ResultFactory::makeResult($row, $this->params);
+            $oneResult = ResultFactory::makeResult($row, $this->params, $this->bookUrlEncoder);
             if (!empty($oneResult)) {
                 $oneResult->search_request_id = $searchRequest->id;
                 $oneResult->save();

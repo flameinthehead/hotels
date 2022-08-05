@@ -3,6 +3,7 @@
 namespace App\UseCase\Yandex;
 
 use App\Models\Result;
+use App\UseCase\Search\BookUrlEncoderInterface;
 use App\UseCase\Search\SearchParamsFactoryInterface;
 use App\UseCase\Search\SearchResultFactory;
 
@@ -11,8 +12,11 @@ class ResultFactory implements SearchResultFactory
     public const BASE_RESULT_URL = 'https://travel.yandex.ru/hotels/';
     public const OPTIMAL_PREVIEW_SIZE = 'L';
 
-    public static function makeResult(array $searchResult, SearchParamsFactoryInterface $params): ?Result
-    {
+    public static function makeResult(
+        array $searchResult,
+        SearchParamsFactoryInterface $params,
+        BookUrlEncoderInterface $bookUrlEncoder
+    ): ?Result {
         /* @var Params $params */
         $result = new Result();
         $result->setName($searchResult['hotel']['name']);
@@ -21,11 +25,11 @@ class ResultFactory implements SearchResultFactory
             'checkinDate' => $params->getCheckInDate(),
             'checkoutDate' => $params->getCheckOutDate(),
         ];
-        $result->setBookLink(
-            self::BASE_RESULT_URL
-            .$searchResult['hotel']['hotelSlug'].'?'
-            .http_build_query($resultParams)
-        );
+        $originalBookLink = self::BASE_RESULT_URL
+            .$searchResult['hotel']['hotelSlug']
+            .'?' .http_build_query($resultParams);
+
+        $result->setBookLink($bookUrlEncoder->encode($originalBookLink));
 
         self::parseDistance($searchResult, $result);
         self::parsePreview($searchResult, $result);
