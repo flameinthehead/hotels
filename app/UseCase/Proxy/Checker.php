@@ -113,7 +113,7 @@ class Checker
             ]
         )->inRandomOrder()->firstOrFail();
         $params->setCity($city);
-        $params->setCheckInDate(Carbon::today()->addDays(rand(3, 60)));
+        $params->setCheckInDate(Carbon::today()->addDays(rand(3, 30)));
         $checkInDate = clone $params->getCheckInDate();
         $params->setCheckOutDate($checkInDate->addDays(rand(3, 10)));
         $searchSource->setParams($params);
