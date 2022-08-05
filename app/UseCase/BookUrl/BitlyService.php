@@ -22,7 +22,7 @@ class BitlyService
             self::BASE_URL,
             [
                 RequestOptions::JSON => [
-                    'group_guid' => 'ostrovok',
+                    'group_guid' => 'mg1qtZWPEkDtIKyP',
                     'domain' => self::DOMAIN,
                     'long_url' => $url,
                 ],

@@ -15,8 +15,6 @@ class BookUrlEncoder implements BookUrlEncoderInterface
 
     public function encode(string $bookLink): string
     {
-        return $this->bitlyService->short(
-            str_replace('{book_url}', urlencode($bookLink), self::PARTNER_LINK_PATTERN)
-        );
+        return str_replace('{book_url}', urlencode($bookLink), self::PARTNER_LINK_PATTERN);
     }
 }
