@@ -19,11 +19,10 @@ class Proxy extends Model
         $query = self::query();
         if (!empty($source) && Schema::hasColumn($this->getTable(), $source)) {
             $query->select('address');
-            $query->where(function ($query) use ($source) {
-                /* @var Builder $query */
+            /*$query->where(function ($query) use ($source) {
                 $query->where($source, '1');
                 $query->orWhereNull($source);
-            });
+            });*/
         }
 
         if(!empty($proxySource)) {
