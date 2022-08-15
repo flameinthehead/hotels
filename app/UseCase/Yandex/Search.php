@@ -72,7 +72,7 @@ class Search implements SearchSourceInterface
             $geoId = $this->suggestions->findByCityName($generalParams->getCity()->name);
             $yandexCity = new YandexCity();
             $yandexCity->yandex_city_id = $geoId;
-            $yandexCity->city_id = $generalParams->getCity()->id;
+            $yandexCity->city_id = $generalParams->getCity()->city_id;
             $yandexCity->save();
         }
 

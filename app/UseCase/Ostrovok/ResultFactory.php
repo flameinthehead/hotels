@@ -20,8 +20,7 @@ class ResultFactory implements SearchResultFactory
         BookUrlEncoderInterface $bookUrlEncoder
     ): ?Result {
         $hotelName = $searchResult['static_vm']['name'] ?? null;
-        $price = $searchResult['rates'][0]['payment_options']['payment_types'][0]['amount'] ?? null;
-
+        $price = $searchResult['rates'][0]['payment_options']['payment_types'][0]['show_amount'] ?? null;
 
         $checkInDate = new \DateTime($params->getArrivalDate());
         $checkOutDate = new \DateTime($params->getDepartureDate());

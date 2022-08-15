@@ -84,7 +84,7 @@ class Search implements SearchSourceInterface
             $cityId = $this->suggestions->findByCityName($generalParams->getCity()->name);
             $ostrovokCity = new OstrovokCity();
             $ostrovokCity->ostrovok_city_id = $cityId;
-            $ostrovokCity->city_id = $generalParams->getCity()->id;
+            $ostrovokCity->city_id = $generalParams->getCity()->city_id;
             $ostrovokCity->save();
         }
         $this->params = \App\UseCase\Ostrovok\Params::makeSourceParams($generalParams);

@@ -7,6 +7,7 @@ use App\Models\TelegramRequest;
 use App\UseCase\Telegram\Calendar;
 use App\UseCase\Telegram\Stars;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\Log;
 use ZeroDaHero\LaravelWorkflow\Events\CompletedEvent;
 use Symfony\Component\Workflow\TransitionBlocker;
 use ZeroDaHero\LaravelWorkflow\Events\GuardEvent;
@@ -97,6 +98,7 @@ class TelegramRequestWorkflowSubscriber
 
     public function onCompletedChooseCity(CompletedEvent $event): void
     {
+        /** @var TelegramRequest $telegramRequest */
         $telegramRequest = $event->getSubject();
         $city = (new City())->findByName($telegramRequest->getLastMessage());
         $telegramRequest->city()->associate($city);
