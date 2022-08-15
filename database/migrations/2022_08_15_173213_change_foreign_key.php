@@ -17,12 +17,12 @@ return new class extends Migration
             $table->unsignedBigInteger('city_id')->change();
         });
 
+        \Illuminate\Support\Facades\DB::table('telegram_requests')->truncate();
         Schema::table('telegram_requests', function (Blueprint $table) {
-//            $table->foreignId('city_id')->constrained('cities', 'city_id')->onDelete('CASCADE');
-            /*$table->foreign('city_id')
+            $table->foreign('city_id')
                 ->references('city_id')
                 ->on('cities')
-                ->onDelete('cascade');*/
+                ->onDelete('cascade');
         });
     }
 
