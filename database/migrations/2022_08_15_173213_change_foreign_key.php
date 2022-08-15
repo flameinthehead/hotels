@@ -18,6 +18,7 @@ return new class extends Migration
         });
 
         Schema::table('telegram_requests', function (Blueprint $table) {
+            $table->dropForeign(['city_id']);
             $table->foreign('city_id')
                 ->references('city_id')
                 ->on('cities')
