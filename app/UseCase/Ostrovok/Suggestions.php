@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 class Suggestions
 {
     public const BASE_URL_PATTERN = 'https://ostrovok.ru/api/site/multicomplete.json?query={query}&locale=ru';
-    public const TIMEOUT = 5;
+    public const TIMEOUT = 10;
 
     public function __construct(private Client $client, private Proxy $proxy)
     {
