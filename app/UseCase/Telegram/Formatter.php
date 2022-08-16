@@ -70,7 +70,7 @@ class Formatter
     private function getBookLink(Result $oneResult): string
     {
         return sprintf(
-            '%s Ссылка для бронирования: <b>%s</b>',
+            '%s <a href="%s"><b>Перейти к бронированию</b></a>',
             Smiles::DOUBLE_RIGHT_ARROW,
             $oneResult->getBookLink()
         );

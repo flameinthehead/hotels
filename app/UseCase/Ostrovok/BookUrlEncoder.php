@@ -2,7 +2,6 @@
 
 namespace App\UseCase\Ostrovok;
 
-use App\UseCase\BookUrl\BitlyService;
 use App\UseCase\Search\BookUrlEncoderInterface;
 
 class BookUrlEncoder implements BookUrlEncoderInterface
