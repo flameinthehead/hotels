@@ -27,7 +27,7 @@ class SearchOstrovok implements ShouldQueue
         try {
             $searchRequest = SearchRequest::where('hash', $this->hash)->firstOrFail();
             $searchService->setParams($this->params);
-            $searchService->search($proxy->getAllEnabledBySource('ostrovok'), $searchRequest);
+            $searchService->search($proxy->getAllEnabledBySource('ostrovok', 20), $searchRequest);
         } catch (\Throwable $e) {
             Log::error($e->getMessage(), $e->getTrace());
         } finally {

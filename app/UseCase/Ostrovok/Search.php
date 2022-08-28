@@ -132,7 +132,7 @@ class Search implements SearchSourceInterface
 
     public function isValidResponse(array $content): bool
     {
-        return (!empty($content) && is_array($content) && isset($content['hotels']));
+        return (!empty($content) && isset($content['hotels']));
     }
 
     public function getConnectionTimeout(): int
