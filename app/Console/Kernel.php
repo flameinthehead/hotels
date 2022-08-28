@@ -21,7 +21,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('proxy:update')->hourly();
+        $schedule->command('proxy:update')->everyThirtyMinutes();
         $schedule->command('proxy:check yandex')->hourly();
         $schedule->command('proxy:check ostrovok')->hourly();
         $schedule->command('proxy:check sutochno')->hourly();
