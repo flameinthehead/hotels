@@ -46,8 +46,6 @@ class Service
 
         $notFinishedTgRequest->save();
 
-        Log::debug($notFinishedTgRequest);
-
         /** @var \Symfony\Component\Workflow\Workflow $workflow */
         $workflow = WorkflowFacade::get($notFinishedTgRequest);
 
