@@ -24,8 +24,8 @@ class SearchYandex implements ShouldQueue
 
     public function handle(Search $searchService, Proxy $proxy, FinishChecker $finishChecker): void
     {
-        $searchRequest = SearchRequest::where('hash', $this->hash)->firstOrFail();
         try {
+            $searchRequest = SearchRequest::where('hash', $this->hash)->firstOrFail();
             $searchService->setParams($this->params);
             $searchService->search($proxy->getAllEnabledBySource('yandex'), $searchRequest);
         } catch (\Throwable $e) {
