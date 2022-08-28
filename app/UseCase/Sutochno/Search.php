@@ -29,6 +29,11 @@ class Search implements SearchSourceInterface
 
     public function search(array $proxyList, SearchRequest $searchRequest): void
     {
+        // т.к. нет звёзд, то не ищем
+        if (!empty($searchRequest->telegramRequest->stars) && $searchRequest->telegramRequest->stars > 0) {
+            return;
+        }
+
         $requestArr = [];
         $options = $this->getOptions();
         foreach ($proxyList as $proxyModel) {
