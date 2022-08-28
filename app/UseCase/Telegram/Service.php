@@ -11,7 +11,9 @@ use ZeroDaHero\LaravelWorkflow\Facades\WorkflowFacade;
 
 class Service
 {
-    public const CHOOSE_CITY_MESSAGE = 'Введите название города';
+    public const MESSAGE_CHOOSE_CITY = 'Введите название города';
+    public const MESSAGE_NEW_SEARCH = 'Новый поиск?';
+    public const MESSAGE_NEW_SEARCH_BUTTON = 'Начать';
 
     public function __construct(
         private TelegramRequest $entity,
@@ -67,8 +69,6 @@ class Service
 
         $count = 0;
         foreach ($messages as $photoUrl => $message) {
-
-
             if (mb_strpos($photoUrl, Formatter::NO_PHOTO) !== false) {
                 $this->sender->sendMessage($chatId, $message);
             } else {
@@ -85,6 +85,16 @@ class Service
                 break;
             }
         }
+
+        $this->sender->sendMessage(
+            $chatId,
+            self::MESSAGE_NEW_SEARCH,
+            [
+                [
+                    ['text' => self::MESSAGE_NEW_SEARCH_BUTTON, 'callback_data' => '/new_search']
+                ]
+            ]
+        );
     }
 
     private function findTgRequest(int $fromId, string $message): ?TelegramRequest
@@ -97,7 +107,7 @@ class Service
                 'telegram_from_id' => $fromId,
                 'last_message' => $message,
             ]);
-            $this->sender->sendMessage($fromId, self::CHOOSE_CITY_MESSAGE);
+            $this->sender->sendMessage($fromId, self::MESSAGE_CHOOSE_CITY);
         }
 
         return $notFinishedTgRequest;
