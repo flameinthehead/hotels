@@ -21,6 +21,10 @@ class SearchSourceServiceProvider extends ServiceProvider
         $this->app->bind('ostrovok', function ($app) {
             return $app->make(\App\UseCase\Ostrovok\Search::class);
         });
+
+        $this->app->bind('sutochno', function ($app) {
+            return $app->make(\App\UseCase\Sutochno\Search::class);
+        });
     }
 
     /**

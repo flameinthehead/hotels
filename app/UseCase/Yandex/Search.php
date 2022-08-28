@@ -9,7 +9,6 @@ use App\Models\YandexCity;
 use App\UseCase\Search\SearchSourceInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
-use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\Serializer;
 
@@ -115,7 +114,7 @@ class Search implements SearchSourceInterface
 
     public function isValidResponse(array $content): bool
     {
-        return (!empty($content) && is_array($content) && isset($content['data']['hotels']));
+        return (!empty($content) && isset($content['data']['hotels']));
     }
 
     /**
@@ -149,5 +148,15 @@ class Search implements SearchSourceInterface
         }
 
         throw new YandexSearchException('Yandex search invalid response, id = ' . $searchRequestId);
+    }
+
+    public function getConnectionTimeout(): int
+    {
+        return self::CONNECTION_TIMEOUT;
+    }
+
+    public function getTimeout(): int
+    {
+        return self::TIMEOUT;
     }
 }

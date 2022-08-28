@@ -18,7 +18,7 @@ class Result extends Model
 
     public function searchRequest(): BelongsTo
     {
-        $this->belongsTo(SearchRequest::class);
+        return $this->belongsTo(SearchRequest::class);
     }
 
     public function getLatitude(): float
@@ -92,7 +92,7 @@ class Result extends Model
         return $this->distance_to_center;
     }
 
-    public function setDistanceToCenter(float $distanceToCenter): void
+    public function setDistanceToCenter(?float $distanceToCenter): void
     {
         $this->attributes['distance_to_center'] = $distanceToCenter;
     }

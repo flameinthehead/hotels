@@ -12,14 +12,14 @@ RUN apt-get update && \
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-RUN docker-php-ext-install gd
-
 USER root
 
 ARG UID=1001
 ARG GID=1001
 
 RUN usermod -u $UID www-data && groupmod -g $GID www-data
+
+RUN docker-php-ext-install gd && docker-php-ext-enable gd
 
 USER www-data
 

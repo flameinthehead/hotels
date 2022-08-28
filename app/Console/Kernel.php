@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('proxy:update')->hourly();
         $schedule->command('proxy:check yandex')->hourly();
         $schedule->command('proxy:check ostrovok')->hourly();
+        $schedule->command('proxy:check sutochno')->hourly();
     }
 
     /**

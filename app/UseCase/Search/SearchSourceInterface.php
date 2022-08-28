@@ -15,4 +15,8 @@ interface SearchSourceInterface
     public function getOptions(): array;
 
     public function isValidResponse(array $content): bool;
+
+    public function getConnectionTimeout(): int;
+
+    public function getTimeout(): int;
 }

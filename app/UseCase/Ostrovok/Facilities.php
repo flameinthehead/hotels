@@ -17,7 +17,7 @@ class Facilities
         'beach' => 'Пляж рядом'
     ];
 
-    public static function getFacilityByCode(string $code)
+    public static function getFacilityByCode(string $code): ?string
     {
         return self::FACILITIES[$code] ?? null;
     }

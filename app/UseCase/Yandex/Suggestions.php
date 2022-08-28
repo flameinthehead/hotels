@@ -43,11 +43,13 @@ class Suggestions
             if (!isset($decoded['data']['items']) || !is_array($decoded['data']['items'])) {
                 continue;
             }
-            $cityData = reset($decoded['data']['items']);
-            if (empty($cityData['redirectParams']['geoId'])) {
-                continue;
+
+            foreach ($decoded['data']['items'] as $cityData) {
+                if ($cityData['name'] != $cityName || empty($cityData['redirectParams']['geoId'])) {
+                    continue;
+                }
+                return $cityData['redirectParams']['geoId'];
             }
-            return $cityData['redirectParams']['geoId'];
         }
 
         throw new \Exception('Yandex - Не корректный формат ответа от Suggestions');

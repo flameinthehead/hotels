@@ -134,4 +134,14 @@ class Search implements SearchSourceInterface
     {
         return (!empty($content) && is_array($content) && isset($content['hotels']));
     }
+
+    public function getConnectionTimeout(): int
+    {
+        return self::CONNECTION_TIMEOUT;
+    }
+
+    public function getTimeout(): int
+    {
+        return self::TIMEOUT;
+    }
 }

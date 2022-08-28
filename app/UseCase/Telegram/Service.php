@@ -67,10 +67,17 @@ class Service
 
         $count = 0;
         foreach ($messages as $photoUrl => $message) {
+
+
             if (mb_strpos($photoUrl, Formatter::NO_PHOTO) !== false) {
                 $this->sender->sendMessage($chatId, $message);
             } else {
-                $this->sender->sendPhoto($chatId, $photoUrl, $message);
+                if (mb_strpos($photoUrl, '.webp') !== false) {
+                    $this->sender->sendSticker($chatId, $photoUrl);
+                    $this->sender->sendMessage($chatId, $message);
+                } else {
+                    $this->sender->sendPhoto($chatId, $photoUrl, $message);
+                }
             }
 
             ++$count;

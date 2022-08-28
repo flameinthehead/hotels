@@ -20,6 +20,11 @@ class City extends Model
         return $this->hasOne(OstrovokCity::class, 'city_id', 'city_id');
     }
 
+    public function sutochnoCity(): HasOne
+    {
+        return $this->hasOne(SutochnoCity::class, 'city_id', 'city_id');
+    }
+
     public function findByName(string $name): self|null
     {
         return self::query()->where('name', $name)->get()->first();

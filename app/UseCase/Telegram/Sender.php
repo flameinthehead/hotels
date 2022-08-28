@@ -58,6 +58,16 @@ class Sender
         $this->makeRequest('sendPhoto', $request);
     }
 
+    public function sendSticker(int $chatId, string $stickerUrl): void
+    {
+        $request = [
+            'chat_id' => $chatId,
+            'sticker' => $stickerUrl,
+        ];
+
+        $this->makeRequest('sendSticker', $request);
+    }
+
     private function makeRequest(string $method, array $params = []): bool
     {
         $url = sprintf(self::BASE_URL.'%s/%s', env('TELEGRAM_BOT_TOKEN'), $method);
@@ -66,7 +76,7 @@ class Sender
         $params[self::PARSE_MODE_FIELD] = self::PARSE_MODE_VALUE;
 
         $response = $this->client->post($url, [
-            RequestOptions::JSON => !empty($params) ? $params : []
+            RequestOptions::JSON => !empty($params) ? $params : [],
         ]);
 
         if ($response->getStatusCode() !== 200) {

@@ -4,4 +4,5 @@
 return [
     'yandex',
     'ostrovok',
+    'sutochno'
 ];

@@ -181,7 +181,7 @@ class Params implements SearchParamsFactoryInterface
     }
 
     /**
-     * @param string $checkInDate
+     * @param string $checkinDate
      */
     public function setCheckinDate(string $checkinDate): void
     {
