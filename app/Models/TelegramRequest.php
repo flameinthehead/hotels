@@ -100,12 +100,12 @@ class TelegramRequest extends Model
 
     public function setIsFinished(bool $isFinished): void
     {
-        $this->is_finished = $isFinished;
+        $this->attributes['is_finished'] = $isFinished;
     }
 
     public function setStars(int $stars): void
     {
-        $this->stars = $stars;
+        $this->attributes['stars'] = $stars;
     }
 
     public function getStars(): int

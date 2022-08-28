@@ -5,6 +5,7 @@ namespace App\UseCase\Telegram;
 use App\Models\TelegramRequest;
 use App\UseCase\Search\Params;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 use ZeroDaHero\LaravelWorkflow\Facades\WorkflowFacade;
@@ -14,6 +15,8 @@ class Service
     public const MESSAGE_CHOOSE_CITY = 'Введите название города';
     public const MESSAGE_NEW_SEARCH = 'Новый поиск?';
     public const MESSAGE_NEW_SEARCH_BUTTON = 'Начать';
+
+    public const COMMAND_NEW_REQUEST = '/new_search';
 
     public function __construct(
         private TelegramRequest $entity,
@@ -42,6 +45,8 @@ class Service
         }
 
         $notFinishedTgRequest->save();
+
+        Log::debug($notFinishedTgRequest);
 
         /** @var \Symfony\Component\Workflow\Workflow $workflow */
         $workflow = WorkflowFacade::get($notFinishedTgRequest);
@@ -100,8 +105,13 @@ class Service
     private function findTgRequest(int $fromId, string $message): ?TelegramRequest
     {
         $notFinishedTgRequest = $this->entity->findNotFinishedByUserId($fromId);
+        if (!empty($notFinishedTgRequest) && $message == self::COMMAND_NEW_REQUEST) {
+            $notFinishedTgRequest->setIsFinished(true);
+            $notFinishedTgRequest->save();
+            $notFinishedTgRequest = null;
+        }
 
-        if (empty($notFinishedTgRequest)) {
+        if ($message == self::COMMAND_NEW_REQUEST || empty($notFinishedTgRequest)) {
             TelegramRequest::create([
                 'status' => TelegramRequest::STATUS_NEW,
                 'telegram_from_id' => $fromId,

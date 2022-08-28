@@ -110,7 +110,9 @@ class TelegramRequestWorkflowSubscriber
         $telegramRequest = $event->getSubject();
 
         if (!$this->calendar->isSelectedDate($telegramRequest->getLastMessage())) {
-            $event->setBlocked(true);
+            $event->addTransitionBlocker(
+                new TransitionBlocker('Необходимо выбрать даты заезда в календаре', '403')
+            );
         }
     }
 
@@ -127,7 +129,9 @@ class TelegramRequestWorkflowSubscriber
         $telegramRequest = $event->getSubject();
 
         if (!$this->calendar->isSelectedDate($telegramRequest->getLastMessage())) {
-            $event->setBlocked(true);
+            $event->addTransitionBlocker(
+                new TransitionBlocker('Необходимо выбрать даты отъезда в календаре', '403')
+            );
         }
     }
 
