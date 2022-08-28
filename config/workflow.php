@@ -23,6 +23,7 @@ return [
                 'metadata' => [
                     'next_message' => 'Выберите дату отъезда',
                     'need_calendar' => true,
+                    'selected_date_message' => 'Выбранная дата заезда'
                 ]
             ],
             'choose_check_out' => [
@@ -30,6 +31,7 @@ return [
                 'to' => 'check_out',
                 'metadata' => [
                     'next_message' => 'Введите количество взрослых',
+                    'selected_date_message' => 'Выбранная дата отъезда'
                 ]
             ],
             'choose_adults' => [

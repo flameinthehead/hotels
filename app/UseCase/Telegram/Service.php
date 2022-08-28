@@ -160,18 +160,31 @@ class Service
             throw new \Exception('Не задано сообщение для отправки в ТГ');
         }
 
-        if (!empty($callBackMessageId) && !$this->calendar->isSelectedDate($callBackData)) {
+        if (!empty($callBackMessageId)) {
             if ($this->calendar->isUselessCallBackData($callBackData)) {
                return;
             }
 
-            $this->sender->editMessage(
-                $fromId,
-                $callBackMessageId,
-                $prevMessage,
-                $this->calendar->makeCalendar($callBackData)
-            );
-            return;
+            if ($this->calendar->isSelectedDate($callBackData)) {
+                $selectedDate = $this->calendar->parseDate($callBackData);
+                $this->sender->editMessage(
+                    $fromId,
+                    $callBackMessageId,
+                    sprintf(
+                        '%s: <b>%s</b>',
+                        $transitionMetadata['selected_date_message'],
+                        $selectedDate->format('d.m.Y')
+                    )
+                );
+            } else {
+                $this->sender->editMessage(
+                    $fromId,
+                    $callBackMessageId,
+                    $prevMessage,
+                    $this->calendar->makeCalendar($callBackData)
+                );
+                return;
+            }
         }
 
 
