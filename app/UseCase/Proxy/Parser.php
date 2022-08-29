@@ -12,8 +12,11 @@ class Parser
         $proxyList = $source->parse($proxy);
 
         foreach ($proxyList as $item) {
-            $proxy = Proxy::firstOrCreate($item);
-            $proxy->save();
+            $proxy = Proxy::query()->where('address', $item['address'])->first();
+            if (empty($proxy)) {
+                $proxy = Proxy::firstOrCreate($item);
+                $proxy->save();
+            }
         }
     }
 }
