@@ -9,7 +9,7 @@ use App\UseCase\Proxy\Source\ProxySearcher;
 return [
     'sources' => [
         HideMyName::SOURCE => HideMyName::class,
-//        Geonode::SOURCE => Geonode::class,
+        Geonode::SOURCE => Geonode::class,
         RootJazz::SOURCE => RootJazz::class,
         ProxyScrape::SOURCE => ProxyScrape::class,
         FreeProxyListNet::SOURCE => FreeProxyListNet::class,

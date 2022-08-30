@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 class HideMyName implements SourceInterface
 {
     public const BASE_URL = 'https://hidemy.name/ru/proxy-list/';
-    public const PAGES = 100;
+    public const PAGES = 200;
     public const SOURCE = 'hidemyname';
 
     public function __construct(private Client $client)
