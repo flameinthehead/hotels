@@ -6,6 +6,7 @@ use App\Models\Proxy;
 use App\UseCase\Proxy\Parser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use function config;
 
 class Update extends Command
@@ -64,7 +65,7 @@ class Update extends Command
             }
             $this->info('Прокси обновлены');
         } catch (\Exception $e) {
-            $this->error($e->getMessage());
+            Log::error($e->getMessage(), $e->getTrace());
             return false;
         }
 
