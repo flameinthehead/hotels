@@ -17,7 +17,7 @@ class HideMyName implements SourceInterface
     {
     }
 
-    public function parse(Proxy $proxy = null): Collection
+    public function parse(): Collection
     {
         $proxyList = [];
         // первые 20 страниц по пингу

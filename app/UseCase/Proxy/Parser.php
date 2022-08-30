@@ -7,9 +7,9 @@ use App\Models\Proxy;
 
 class Parser
 {
-    public function update(SourceInterface $source, Proxy $proxy = null)
+    public function update(SourceInterface $source): void
     {
-        $proxyList = $source->parse($proxy);
+        $proxyList = $source->parse();
 
         foreach ($proxyList as $item) {
             $proxy = Proxy::query()->where('address', $item['address'])->first();

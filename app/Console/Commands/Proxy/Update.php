@@ -46,20 +46,17 @@ class Update extends Command
             $sources = config('proxy.sources');
             $source = $this->argument('source');
 
-            /* @var Proxy $proxy */
-            $proxy = null;
-
             if (!empty($source)) {
                 if(!isset($sources[$source])){
                     $this->error('Неизвестный код прокси');
                     return self::FAILURE;
                 }
-                $this->parser->update(App::make($sources[$source]), $proxy);
+                $this->parser->update(App::make($sources[$source]));
             } else {
                 $bar = $this->output->createProgressBar(count($sources));
                 foreach ($sources as $sourceClass) {
                     $bar->advance();
-                    $this->parser->update(App::make($sourceClass), $proxy);
+                    $this->parser->update(App::make($sourceClass));
                 }
                 $bar->finish();
             }

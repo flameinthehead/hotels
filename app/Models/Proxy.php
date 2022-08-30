@@ -36,8 +36,7 @@ class Proxy extends Model
 
     public function getRandBySource(string $source): self
     {
-        $query = self::query()->where($source, '1')->inRandomOrder();
-        return $query->firstOrFail();
+        return self::query()->where($source, '1')->inRandomOrder()->firstOrFail();
     }
 
     public function getAllEnabledBySource(string $source, int $limit = 10): array
