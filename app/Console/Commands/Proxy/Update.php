@@ -65,6 +65,7 @@ class Update extends Command
             }
             $this->info('Прокси обновлены');
         } catch (\Exception $e) {
+            $this->error($e->getMessage());
             Log::error($e->getMessage(), $e->getTrace());
             return false;
         }
