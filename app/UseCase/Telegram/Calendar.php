@@ -43,10 +43,11 @@ class Calendar
     {
         $date = $this->parseDate($callBackData);
 
-        $this->addMonthName($date->add(new \DateInterval('P1D'))->format('m'));
+        $nextDay = $date->add(new \DateInterval('P1D'));
+        $this->addMonthName($nextDay->format('m'));
         $this->addWeekDayNames();
-        $this->addMonthNumbers($date);
-        $this->addArrows($date);
+        $this->addMonthNumbers($nextDay);
+        $this->addArrows($nextDay);
 
         return $this->calendarData;
     }
