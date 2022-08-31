@@ -113,6 +113,10 @@ class Calendar
         $isPushedFirstNumber = false;
         $maxDays = $date->format('t');
         while (true) {
+            if ($dayOfMonth > $maxDays) {
+                $this->addFinalEmptyButtons($row);
+                break;
+            }
             $monthDay = new \DateTimeImmutable($dayOfMonth.'-'.$date->format('m') .'-'.$date->format('o'));
             if ($monthDay < $date) {
                 ++$dayOfMonth;
@@ -142,16 +146,6 @@ class Calendar
             }
 
             ++$dayOfMonth;
-
-            if ($dayOfMonth > $maxDays) {
-                $this->addFinalEmptyButtons($row);
-                break;
-            }
-
-            /*if ($dayOfMonth == $date->format('t')) {
-
-                break;
-            }*/
         }
     }
 
