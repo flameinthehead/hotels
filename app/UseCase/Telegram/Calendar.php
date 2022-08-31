@@ -59,7 +59,7 @@ class Calendar
     public function parseDate(string $callBackData = null): \DateTimeImmutable
     {
         if (empty($callBackData)) {
-            return new \DateTimeImmutable();
+            return new \DateTimeImmutable('+1 day');
         }
 
         if (mb_strpos($callBackData, self::PREV_MONTH_PREFIX) !== false) {
