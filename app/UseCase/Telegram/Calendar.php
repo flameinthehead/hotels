@@ -43,7 +43,7 @@ class Calendar
     {
         $date = $this->parseDate($callBackData);
 
-        $this->addMonthName($date->format('m'));
+        $this->addMonthName($date->add(new \DateInterval('P1D'))->format('m'));
         $this->addWeekDayNames();
         $this->addMonthNumbers($date);
         $this->addArrows($date);
@@ -59,7 +59,7 @@ class Calendar
     public function parseDate(string $callBackData = null): \DateTimeImmutable
     {
         if (empty($callBackData)) {
-            return new \DateTimeImmutable('+1 day');
+            return new \DateTimeImmutable();
         }
 
         if (mb_strpos($callBackData, self::PREV_MONTH_PREFIX) !== false) {
