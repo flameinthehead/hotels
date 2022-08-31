@@ -42,8 +42,8 @@ class Calendar
     public function makeCalendar(string $callBackData = null): array
     {
         $date = $this->parseDate($callBackData);
+        $nextDay = new \DateTimeImmutable($date->add(new \DateInterval('P1D'))->format('Y-m-d'));
 
-        $nextDay = $date->add(new \DateInterval('P1D'));
         $this->addMonthName($nextDay->format('m'));
         $this->addWeekDayNames();
         $this->addMonthNumbers($nextDay);
