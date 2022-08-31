@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 
 class Proxy extends Model
@@ -22,6 +22,10 @@ class Proxy extends Model
             $query->where(function ($query) use ($source) {
                 $query->where($source, '1');
                 $query->orWhereNull($source);
+            });
+            $query->orWhere(function ($query) use ($source) {
+                $query->where($source, '0');
+                $query->where('created_at', '>=', Carbon::today());
             });
         }
 
